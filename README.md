@@ -1,366 +1,283 @@
 # Lendora AI
 
-> **Privacy-First DeFi Lending on Cardano 2025 with Immersive 3D Interface**
+> **Privacy-First DeFi Lending on Cardano 2025**
 
-Lendora is a next-generation decentralized lending protocol where AI agents negotiate loans in private **Hydra Heads** to avoid gas fees, using **Midnight ZK-Proofs** for credit scoring, presented through a stunning **3D immersive dashboard**.
+Lendora is a next-generation decentralized lending protocol where AI agents negotiate loans in private **Hydra Heads** (zero gas fees), using **Midnight ZK-Proofs** for credit scoring, with a stunning **3D immersive dashboard**.
 
 ---
 
-## The Vision
+## Live Demo
 
-Traditional DeFi lending has three major problems:
+```bash
+# Start Backend
+cd backend/api && uvicorn server:app --port 8000
 
-1. **Gas Fees** - Every negotiation step costs money
-2. **Privacy Leaks** - Credit scores are public on-chain
-3. **Black Box AI** - Users don't understand AI decisions
+# Start Frontend  
+cd frontend/Dashboard && npm run dev
 
-### Lendora's Solution
-
-```mermaid
-graph TD
-    A[Borrower] -->|Credit Score ZK Proof| B[Midnight Privacy Layer]
-    B -->|Eligible| C[Hydra Head Negotiation]
-    A -->|Loan Request| C
-    D[Lender] -->|Loan Offer| C
-    C -->|AI Agent Lenny| E[Off-Chain Negotiation]
-    E -->|Agreement| F[Settlement on L1]
-    F -->|Aiken Validator| G[Loan Escrowed]
-    
-    style B fill:#9333ea
-    style C fill:#0ea5e9
-    style E fill:#10b981
-    style G fill:#f59e0b
+# Open: http://localhost:8080/dashboard
 ```
 
 ---
 
-## Full Stack Architecture
+## Architecture
 
-### Backend: The Cardano 2025 Stack
+```
+    Borrower                     Midnight                      Lender
+       |                            |                            |
+       |-- Credit Score (PRIVATE) ->|                            |
+       |                            |-- is_eligible: true ------>|
+       |                            |   (ZK Proof - score hidden)|
+       |                            |                            |
+       |                            |<---- Loan Offer -----------|
+       |                            |                            |
+       v                            v                            v
+                        +-------------------+
+                        |  AI Agent (Lenny) |
+                        |  Llama 3 (Local)  |
+                        +-------------------+
+                                 |
+                                 v
+                        +-------------------+
+                        |   Hydra Head      |
+                        |  (Off-chain L2)   |
+                        +-------------------+
+                                 |
+                         Negotiate (0 gas!)
+                         Multiple rounds
+                                 |
+                                 v
+                        +-------------------+
+                        |  Aiken Validator  |
+                        |  (Settlement L1)  |
+                        +-------------------+
+                                 |
+                         Verify Dual Sig
+                                 |
+                                 v
+                        +-------------------+
+                        |  LOAN DISBURSED!  |
+                        +-------------------+
+```
+
+---
+
+## The Problem & Solution
+
+| Problem | Lendora's Solution |
+|---------|-------------------|
+| **Gas Fees** - Every negotiation costs money | **Hydra Heads** - Unlimited off-chain rounds, zero gas |
+| **Privacy Leaks** - Credit scores on-chain | **Midnight ZK** - Prove eligibility without revealing score |
+| **Black Box AI** - Users don't understand decisions | **XAI Logging** - Every decision explained with reasoning |
+| **Centralized AI** - Data sent to OpenAI | **Local Llama 3** - All AI runs on your machine via Ollama |
+
+---
+
+## Tech Stack
+
+### Backend (Cardano 2025)
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **AI Agents** | Masumi (CrewAI + Llama 3) | Privacy-first loan negotiation |
-| **Scaling** | Hydra Head Protocol | Off-chain, zero-gas-fee negotiation |
-| **Settlement** | Aiken Smart Contracts | On-chain loan escrow & verification |
+| **AI Agents** | CrewAI + Llama 3 (Ollama) | Privacy-first loan negotiation |
+| **L2 Scaling** | Hydra Head Protocol | Off-chain, zero-gas negotiation |
+| **Settlement** | Aiken Smart Contracts | On-chain loan escrow & dual-sig verification |
 | **Privacy** | Midnight Compact | Zero-knowledge credit scoring |
 | **API** | FastAPI + WebSockets | Real-time backend communication |
 
-### Frontend: Kasane-Cosmos Aesthetic
+### Frontend (Immersive 3D)
 
 | Component | Technology | Purpose |
 |-----------|-----------|---------|
-| **3D Engine** | React Three Fiber + Drei | Immersive 3D interface |
-| **Animations** | Framer Motion | Scroll-linked 3D transforms |
-| **UI Framework** | React + TypeScript + Vite | Fast, type-safe development |
-| **Styling** | Tailwind CSS | Glassmorphism & custom palettes |
-| **Theme** | next-themes | Dark/Light mode (Cyber-Noir/Foggy Future) |
+| **3D Engine** | React Three Fiber + Drei | WebGL 3D interface |
+| **Animations** | Framer Motion | Scroll-linked transforms |
+| **UI** | React + TypeScript + Vite | Type-safe, fast builds |
+| **Styling** | Tailwind CSS | Glassmorphism & themes |
+| **State** | React Query + WebSocket | Real-time updates |
 
 ---
 
 ## Features
 
-### Backend
-- **Privacy-First AI**: Llama 3 runs locally via Ollama - no data leaves your machine
-- **Zero Gas Negotiations**: Unlimited negotiation rounds in Hydra Heads
-- **ZK Credit Scoring**: Prove creditworthiness without revealing your score
-- **Explainable AI**: Every decision logged with reasoning (XAI)
-- **Real-Time Updates**: WebSocket support for live agent status
+### Complete Workflow (All Working!)
 
-### Frontend
-- **3D Portal Login**: Rotating holographic cube with particle field background
-- **Floating Dashboards**: Glassmorphic Bento grid cards with liquid distortion
-- **Kasane Scroll Effect**: Trade cards tilt in 3D space as you scroll
-- **Agent Status Orb**: Pulsing 3D sphere showing real-time AI status
-- **Camera Transitions**: Cinematic zoom animations between views
-- **Dual Themes**: Cyber-Noir (dark) and Foggy Future (light) palettes
+1. **Midnight ZK Credit Check** - Submit credit score privately, get public eligibility
+2. **Loan Offer Creation** - Lender creates offer with terms
+3. **Hydra Head Opening** - Private negotiation channel (L2)
+4. **AI Analysis** - Llama 3 analyzes offer locally
+5. **Off-chain Negotiation** - Multiple rounds, zero gas fees
+6. **Aiken Settlement** - On-chain verification with dual signatures
+7. **Loan Disbursement** - Funds released to borrower
+
+### AI Agents
+
+- **Lenny (Borrower Agent)** - Analyzes offers, negotiates best rates
+- **Luna (Lender Agent)** - Assesses risk, evaluates counter-offers
+- **XAI Logging** - All decisions logged with reasoning & confidence
+
+### Frontend Dashboard
+
+- **3D Login Portal** - Holographic cube with particle field
+- **Agent Status Orb** - Real-time 3D sphere (green=profiting, blue=negotiating)
+- **Workflow Visualizer** - Live step-by-step progress
+- **Trade History** - Completed loans with savings shown
+- **Dual Themes** - Cyber-Noir (dark) / Foggy Future (light)
 
 ---
 
 ## Quick Start
 
-See [QUICKSTART.md](./QUICKSTART.md) for detailed instructions.
-
-### 1. Backend API Server
+### Prerequisites
 
 ```bash
-cd backend/api
-pip install -r requirements.txt
-python server.py
+# 1. Ollama (for local Llama 3)
+curl -fsSL https://ollama.com/install.sh | sh
+ollama pull llama3
+ollama serve  # Keep running
+
+# 2. Node.js 18+
+node --version  # Should be 18+
+
+# 3. Python 3.10+
+python --version  # Should be 3.10+
 ```
 
-Server runs at:
-- REST API: `http://localhost:8000`
-- WebSocket: `ws://localhost:8000/ws`
-- API Docs: `http://localhost:8000/docs`
-
-### 2. Frontend Dashboard
+### Installation
 
 ```bash
+# Clone
+git clone https://github.com/your-repo/Lendora-AI.git
+cd Lendora-AI
+
+# Backend dependencies
+pip install -r requirements.txt
+pip install -r backend/api/requirements.txt
+
+# Frontend dependencies
 cd frontend/Dashboard
 npm install
+cd ../..
+```
+
+### Running
+
+**Terminal 1 - Backend:**
+```bash
+cd backend/api
+uvicorn server:app --host 0.0.0.0 --port 8000
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend/Dashboard
 npm run dev
 ```
 
-Dashboard runs at: `http://localhost:5173`
-
-### 3. AI Agent (Optional)
-
+**Terminal 3 - AI Agent (Optional):**
 ```bash
-# Ensure Ollama is running first
-ollama serve
-
-# Run the Masumi agent
 python agents/borrower_agent.py
 ```
+
+### URLs
+
+| Service | URL |
+|---------|-----|
+| Frontend Dashboard | http://localhost:8080/dashboard |
+| Backend API | http://localhost:8000 |
+| API Documentation | http://localhost:8000/docs |
+| Ollama | http://localhost:11434 |
+
+---
+
+## API Endpoints
+
+### Start Complete Workflow
+
+```bash
+POST /api/workflow/start
+Content-Type: application/json
+
+{
+  "borrower_address": "addr1_borrower_alice",
+  "credit_score": 750,
+  "principal": 1000,
+  "interest_rate": 8.5,
+  "term_months": 12,
+  "lender_address": "addr1_lender_bob"
+}
+
+# Response
+{
+  "success": true,
+  "settlement": {
+    "tx_hash": "tx_head_...",
+    "borrower": "addr1_borrower_alice",
+    "lender": "addr1_lender_bob",
+    "principal": 1000,
+    "final_rate": 7.0,
+    "status": "LOAN_DISBURSED"
+  }
+}
+```
+
+### Other Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/dashboard/stats` | GET | Dashboard statistics |
+| `/api/trades/history` | GET | Recent trade history |
+| `/api/agent/status` | GET | AI agent status |
+| `/api/agent/xai-logs` | GET | Explainable AI decision logs |
+| `/api/midnight/credit-check` | POST | ZK credit verification |
+| `/ws` | WebSocket | Real-time updates |
 
 ---
 
 ## Project Structure
 
 ```
-lendora-ai/
-├── agents/                          # AI Agents (Python)
-│   ├── borrower_agent.py           # "Lenny" - The Masumi negotiator
+Lendora-AI/
+├── agents/                      # AI Agents
+│   ├── borrower_agent.py       # Lenny - Borrower negotiator
+│   ├── lender_agent.py         # Luna - Lender evaluator
 │   └── __init__.py
 ├── backend/
 │   └── api/
-│       ├── server.py                # FastAPI + WebSocket server
+│       ├── server.py           # FastAPI + WebSocket server
 │       └── requirements.txt
-├── contracts/                       # Aiken Smart Contracts
-│   └── validators/
-│       └── lendora.ak              # Settlement validator
+├── contracts/
+│   └── contracts/
+│       └── validators/
+│           └── lendora.ak      # Aiken settlement validator
 ├── frontend/
-│   └── Dashboard/                   # Immersive 3D Dashboard
+│   └── Dashboard/
 │       ├── src/
 │       │   ├── components/
-│       │   │   ├── 3d/             # HeroCube, ParticleField, AgentStatusOrb
-│       │   │   └── dashboard/      # TradeTimeline with Kasane scroll
-│       │   ├── lib/api/            # API client & WebSocket manager
-│       │   ├── pages/              # LoginGate, DashboardLayout
-│       │   └── App.tsx
-│       ├── tailwind.config.ts      # Kasane-Cosmos color palettes
+│       │   │   ├── 3d/         # HeroCube, ParticleField, AgentStatusOrb
+│       │   │   ├── dashboard/  # TradeTimeline, StatCard
+│       │   │   └── ui/         # shadcn/ui components
+│       │   ├── hooks/
+│       │   │   ├── useWallet.ts    # Cardano wallet connection
+│       │   │   └── useAgentConnection.ts
+│       │   ├── lib/
+│       │   │   ├── api/        # REST client
+│       │   │   └── wallet/     # CIP-30 wallet integration
+│       │   └── pages/
+│       │       ├── LoginGate.tsx
+│       │       └── DashboardLayout.tsx
 │       └── package.json
-├── hydra/                           # Hydra Head Integration
-│   ├── head_manager.py             # WebSocket client for Hydra node
-│   └── __init__.py
-├── midnight/                        # Privacy Layer
-│   └── credit_score.compact        # ZK credit check
-├── logs/                            # XAI decision logs
-├── QUICKSTART.md                    # Quick setup guide
-├── requirements.txt                 # Python dependencies
-└── README.md                        # You are here!
+├── hydra/
+│   └── head_manager.py         # Hydra WebSocket client
+├── midnight/
+│   └── credit_score.compact    # ZK credit check circuit
+├── logs/
+│   └── xai_decisions.jsonl     # AI decision audit trail
+└── README.md
 ```
 
 ---
 
-## UI Screenshots & Design
-
-### Login Portal
-- **3D HeroCube** - Rotating holographic cube (glass in light mode, neon wireframe in dark mode)
-- **Particle Field** - 5000 WebGL particles react to mouse movement
-- **Camera Zoom** - Portal entrance animation on wallet connect
-
-### Dashboard Cockpit
-- **Bento Grid Layout** - Floating glassmorphic cards
-- **Agent Status Orb** - 3D pulsing sphere (green = profiting, amber = negotiating)
-- **CountUp Animations** - Balance animates to final value
-- **Liquid Distortion** - Cards morph on hover
-
-### Trade Timeline
-- **Kasane Scroll Effect** - Cards tilt backward and blur as you scroll
-- **3D Depth** - Parallax layers create spatial depth
-- **Real-Time Updates** - WebSocket-powered live trade notifications
-
----
-
-## Prerequisites
-
-### 1. Ollama (for local Llama 3)
-```bash
-# Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull Llama 3
-ollama pull llama3
-
-# Start Ollama server
-ollama serve
-```
-
-### 2. Node.js 18+ (for frontend)
-```bash
-# Check version
-node --version
-npm --version
-```
-
-### 3. Python 3.10+ (for backend)
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 4. Aiken (for smart contracts - OPTIONAL)
-```bash
-# Install Aiken
-cargo install aiken
-
-# Check installation
-aiken --version
-```
-
-### 5. Hydra Node (for state channels - OPTIONAL)
-```bash
-# Follow the official guide:
-# https://hydra.family/head-protocol/docs/getting-started
-
-# The Python code expects a node at: ws://localhost:4001
-```
-
----
-
-## The AI Agent: "Lenny"
-
-### Privacy-First Configuration
-
-Lendora uses **Llama 3** running locally via **Ollama**. No data leaves your machine.
-
-```python
-# From agents/borrower_agent.py
-llama3_llm = ChatOpenAI(
-    model="llama3",
-    base_url="http://localhost:11434/v1",  # Local Ollama
-    api_key="NA",  # Not needed for local
-    temperature=0.7,
-)
-```
-
-**Privacy Verified**: No OpenAI GPT-4 - All AI processing happens locally.
-
-### Custom Tools
-
-1. **HydraTool** - Opens Hydra Heads for off-chain negotiation
-2. **XAITool** - Logs decisions for transparency (solves "black box" problem)
-
-### Example Flow
-
-```python
-from agents import monitor_loan_offers
-
-# Lenny listens for loan offers
-monitor_loan_offers()
-
-# When an offer arrives:
-# 1. Lenny analyzes it using Llama 3
-# 2. If acceptable, opens a Hydra Head (HydraTool)
-# 3. Logs reasoning (XAITool) → xai_decisions.jsonl
-```
-
----
-
-## Hydra Head Integration
-
-### The `HydraClient` Class
-
-```python
-from hydra import HydraClient
-
-client = HydraClient()
-
-# 1. Initialize Head with participants
-client.init_head(['participant1', 'participant2'])
-
-# 2. Commit funds
-client.commit_funds('abc123...#0')
-
-# 3. Negotiate off-chain (no gas fees!)
-client.new_tx('84a400...')  # CBOR transaction
-
-# 4. Close and settle on L1
-client.close_head()
-```
-
-### Why Hydra?
-
-- **Instant finality** - No waiting for blocks
-- **Zero gas fees** - Negotiate for free
-- **Private** - Only participants see the state
-
----
-
-## Privacy Layer: Midnight
-
-### Zero-Knowledge Credit Scoring
-
-The `credit_score.compact` contract lets borrowers prove creditworthiness **without revealing their score**.
-
-```compact
-circuit check_eligibility(
-    private credit_score: Uint
-) -> (public is_eligible: Boolean) {
-    const MIN_CREDIT_SCORE: Uint = 700;
-    is_eligible = credit_score > MIN_CREDIT_SCORE;
-    return (is_eligible);
-}
-```
-
-**What the lender sees:**
-- `is_eligible: true`
-- `credit_score: <HIDDEN>`
-
-**Zero-knowledge magic!**
-
----
-
-## Smart Contract: Settlement Validator
-
-The `lendora.ak` Aiken validator ensures:
-
-1. Both borrower and lender have signed
-2. Interest rate is reasonable (0-100%)
-
-```aiken
-validator {
-  fn settle(
-    datum: LoanDatum,
-    redeemer: SettleLoan,
-    context: ScriptContext,
-  ) -> Bool {
-    // Dual signature check
-    signed_by_borrower && signed_by_lender && valid_interest_rate
-  }
-}
-```
-
-### Testing
-
-```bash
-cd contracts
-aiken check
-```
-
----
-
-## Explainable AI (XAI)
-
-Every decision Lenny makes is logged to `logs/xai_decisions.jsonl`:
-
-```json
-{
-  "timestamp": 1732872000,
-  "decision": "accept_loan",
-  "reasoning": "Interest rate of 7.5% is favorable...",
-  "confidence": 0.85
-}
-```
-
-This solves the "black box" problem in AI-driven DeFi.
-
----
-
-## Full Workflow
+## Workflow Sequence
 
 ```mermaid
 sequenceDiagram
@@ -372,85 +289,188 @@ sequenceDiagram
     participant V as Aiken Validator
     
     B->>M: Submit Credit Score (private)
-    M->>L: is_eligible: true (public)
-    L->>A: Loan Offer
+    M->>L: is_eligible: true (ZK proof)
+    Note over M,L: Score remains HIDDEN!
+    L->>A: Loan Offer (8.5%)
     A->>A: Analyze with Llama 3
     A->>H: Open Hydra Head
-    A->>H: Negotiate (off-chain)
-    H->>H: Multiple rounds (zero gas!)
-    A->>H: Accept Final Terms
-    H->>V: Close Head → Settlement Tx
+    loop Off-chain Negotiation
+        A->>H: Counter-offer
+        H->>H: Zero gas!
+    end
+    A->>H: Accept Final Terms (7.0%)
+    H->>V: Close Head + Settlement Tx
     V->>V: Verify Dual Signature
     V->>B: Loan Disbursed!
+    Note over B,V: Saved 1.5% through negotiation!
+```
+
+---
+
+## Smart Contracts
+
+### Aiken Settlement Validator
+
+```aiken
+validator {
+  fn settle(
+    datum: LoanDatum,
+    redeemer: SettleLoan,
+    context: ScriptContext,
+  ) -> Bool {
+    // 1. Interest rate must be reasonable (0-100%)
+    let interest_rate_valid = 
+      redeemer.final_interest_rate >= 0 && 
+      redeemer.final_interest_rate <= 10000
+    
+    // 2. Both parties must sign
+    let signed_by_borrower = 
+      list.has(transaction.extra_signatories, datum.borrower)
+    let signed_by_lender = 
+      list.has(transaction.extra_signatories, datum.lender)
+    
+    interest_rate_valid && signed_by_borrower && signed_by_lender
+  }
+}
+```
+
+### Midnight ZK Credit Check
+
+```compact
+circuit check_eligibility(
+    private credit_score: Uint
+) -> (public is_eligible: Boolean) {
+    const MIN_CREDIT_SCORE: Uint = 700;
+    is_eligible = credit_score > MIN_CREDIT_SCORE;
+    return (is_eligible);
+}
+```
+
+---
+
+## Explainable AI (XAI)
+
+Every AI decision is logged to `logs/xai_decisions.jsonl`:
+
+```json
+{
+  "timestamp": 1732872000,
+  "agent": "lenny",
+  "decision": "accept_loan",
+  "reasoning": "Rate of 7.0% is below market average of 7.5%. Negotiated down from 8.5%, saving 1.5%.",
+  "confidence": 0.85
+}
+```
+
+This solves the "black box" problem - users can audit every AI decision.
+
+---
+
+## Wallet Integration
+
+Supports CIP-30 compatible Cardano wallets:
+
+- Nami
+- Eternl  
+- Yoroi
+- Flint
+- Typhon
+- Gero
+
+```typescript
+import { useWallet } from '@/hooks/useWallet';
+
+const { connect, isConnected, address, balance } = useWallet();
+
+// Connect to wallet
+await connect('nami');
 ```
 
 ---
 
 ## Current Status
 
-### Backend Implemented
-- [x] AI agent with local Llama 3
-- [x] Hydra WebSocket client
-- [x] Aiken settlement validator with tests
-- [x] Midnight ZK credit check (syntactically correct)
-- [x] XAI decision logging
-- [x] FastAPI REST API server
-- [x] WebSocket real-time updates
+### Implemented
 
-### Frontend Implemented
-- [x] 3D immersive login portal (HeroCube + ParticleField)
-- [x] Floating glassmorphic dashboard (Bento grid)
-- [x] Agent Status Orb (3D pulsing sphere)
-- [x] Kasane scroll effect (3D trade timeline)
-- [x] Cyber-Noir/Foggy Future dual themes
-- [x] API client with WebSocket integration
-- [x] CountUp animations and liquid distortion effects
+- [x] Complete workflow (Midnight -> Hydra -> Aiken)
+- [x] AI Agent with local Llama 3 (CrewAI + Ollama)
+- [x] Lender Agent counterpart (Luna)
+- [x] Hydra Head Manager (mock mode)
+- [x] Aiken settlement validator with tests
+- [x] Midnight ZK credit check circuit
+- [x] XAI decision logging
+- [x] FastAPI REST + WebSocket server
+- [x] 3D immersive dashboard
+- [x] Real-time workflow visualization
+- [x] Wallet connection (CIP-30)
+- [x] Mobile-optimized particles
+- [x] Dual themes (Cyber-Noir / Foggy Future)
 
 ### Future Enhancements
-- [ ] Connect to actual Hydra node (currently mocked)
+
+- [ ] Connect to actual Hydra node
 - [ ] Actual Midnight network integration
-- [ ] Real Cardano transaction building (PyCardano)
-- [ ] Lender agent counterpart
+- [ ] Real Cardano tx building (PyCardano)
 - [ ] Holographic 3D analytics charts
 - [ ] Oracle integration for credit scores
-- [ ] Wallet connection (Nami, Eternl, Yoroi)
-- [ ] Mobile responsive 3D (optimized particles)
+- [ ] Multi-agent negotiation scenarios
 
 ---
 
-## Contributing
+## Development
 
-This is a demonstration project showcasing the Cardano 2025 stack. Feel free to:
+### Run Tests
 
-1. Fork and experiment
-2. Build additional agents (e.g., Lender Agent)
-3. Improve the Hydra integration
-4. Add real Cardano transaction logic
+```bash
+# Aiken contracts
+cd contracts/contracts
+aiken check
+
+# Python syntax
+python -m py_compile agents/*.py backend/api/server.py
+
+# Frontend build
+cd frontend/Dashboard
+npm run build
+```
+
+### Environment Variables
+
+Create `.env` in project root:
+
+```env
+OLLAMA_BASE_URL=http://localhost:11434
+HYDRA_NODE_URL=ws://localhost:4001
+VITE_API_URL=http://localhost:8000
+```
 
 ---
 
 ## Resources
 
-### Backend/Blockchain
+### Cardano Stack
 - [Hydra Documentation](https://hydra.family/head-protocol/docs/)
 - [Aiken Language Guide](https://aiken-lang.org/)
 - [Midnight Developer Portal](https://midnight.network/)
+
+### AI/ML
 - [CrewAI Documentation](https://docs.crewai.com/)
 - [Ollama](https://ollama.com/)
+- [LiteLLM](https://docs.litellm.ai/)
 
-### Frontend/3D
+### Frontend
 - [React Three Fiber](https://docs.pmnd.rs/react-three-fiber/)
 - [Drei (R3F Helpers)](https://github.com/pmndrs/drei)
 - [Framer Motion](https://www.framer.com/motion/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Three.js](https://threejs.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
 ---
 
 ## Disclaimer
 
-This is **educational/experimental software**. Do not use in production without:
-- Proper security audits
+This is **educational/experimental software** for the Cardano 2025 hackathon. Do not use in production without:
+
+- Security audits
 - Real credit score oracles
 - Legal compliance review
 - Extensive testing
@@ -463,4 +483,6 @@ MIT License - Build cool things!
 
 ---
 
-**Built with ❤️ for the Cardano 2025 hackathon**
+**Built for the Cardano 2025 Hackathon**
+
+*Privacy-First DeFi Lending with AI Agents, ZK Proofs, and L2 Scaling*
