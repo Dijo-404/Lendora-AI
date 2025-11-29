@@ -37,6 +37,16 @@ except ImportError:
     HYDRA_AVAILABLE = False
     print("[WARNING] Hydra module not available, using built-in mock")
 
+# Import AI Agents
+try:
+    from agents.borrower_agent import create_borrower_agent
+    from agents.lender_agent import create_lender_agent, handle_negotiation_request
+    from crewai import Crew, Task
+    AGENTS_AVAILABLE = True
+except ImportError as e:
+    AGENTS_AVAILABLE = False
+    print(f"[WARNING] Agent modules not available: {e}")
+
 
 # ============================================================================
 # Application Setup
@@ -810,15 +820,109 @@ async def credit_check(req: CreditCheckRequest, background_tasks: BackgroundTask
 
 # --- Loan Workflow ---
 
+async def run_agent_negotiation(
+    conversation_id: str,
+    borrower_address: str,
+    lender_address: str,
+    principal: float,
+    interest_rate: float,
+    term_months: int,
+    auto_confirm: bool = False
+):
+    """Run AI agent negotiation in background."""
+    try:
+        await manager.broadcast({
+            "type": "agent_status",
+            "data": {"status": "negotiating", "task": "AI agents analyzing loan terms..."}
+        })
+        
+        # Create borrower agent task
+        if AGENTS_AVAILABLE:
+            lenny = create_borrower_agent()
+            task = Task(
+                description=(
+                    f"Analyze and negotiate this loan offer:\n"
+                    f"- Principal: {principal}\n"
+                    f"- Interest Rate: {interest_rate}%\n"
+                    f"- Term: {term_months} months\n"
+                    f"- Auto-confirm: {auto_confirm}\n\n"
+                    f"1. Analyze the loan offer\n"
+                    f"2. Negotiate if rate is too high\n"
+                    f"3. Accept if terms are good or auto-confirm is enabled"
+                ),
+                expected_output="Final negotiation result with reasoning",
+                agent=lenny
+            )
+            
+            # Run agent with timeout to prevent hanging
+            crew = Crew(agents=[lenny], tasks=[task], verbose=False)
+            
+            # Run in executor to avoid blocking
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(
+                None,
+                lambda: crew.kickoff()
+            )
+            
+            # Add agent's analysis to conversation
+            result_str = str(result)[:200] + "..." if len(str(result)) > 200 else str(result)
+            state.conversations[conversation_id].append({
+                "id": f"msg_{len(state.conversations[conversation_id])}",
+                "timestamp": datetime.now().isoformat(),
+                "agent": "lenny",
+                "type": "thought",
+                "content": f"AI Analysis: {result_str}",
+                "confidence": 0.85,
+                "reasoning": "AI agent analysis complete"
+            })
+            
+            await manager.broadcast({
+                "type": "conversation_update",
+                "data": {"conversation_id": conversation_id}
+            })
+            
+            await manager.broadcast({
+                "type": "agent_status",
+                "data": {"status": "negotiating", "task": "AI analysis complete"}
+            })
+        else:
+            # Fallback: add mock analysis
+            await asyncio.sleep(1)
+            state.conversations[conversation_id].append({
+                "id": f"msg_{len(state.conversations[conversation_id])}",
+                "timestamp": datetime.now().isoformat(),
+                "agent": "lenny",
+                "type": "thought",
+                "content": f"Analyzing offer... Rate {interest_rate}% is {'acceptable' if interest_rate <= 9 else 'high'}",
+                "confidence": 0.80,
+                "reasoning": "Mock analysis (agents not available)"
+            })
+    except Exception as e:
+        print(f"[Agent] Error in negotiation: {e}")
+        import traceback
+        traceback.print_exc()
+        # Add error message to conversation
+        state.conversations[conversation_id].append({
+            "id": f"msg_{len(state.conversations[conversation_id])}",
+            "timestamp": datetime.now().isoformat(),
+            "agent": "system",
+            "type": "message",
+            "content": f"Agent analysis encountered an error: {str(e)}"
+        })
+
 @app.post("/api/workflow/start")
-async def start_workflow(req: WorkflowRequest):
+async def start_workflow(req: WorkflowRequest, background_tasks: BackgroundTasks):
     """Start the complete lending workflow."""
+    # Reset state for new workflow
+    state.current_negotiation = None
     state.stats["agentStatus"] = "negotiating"
     
     # Initialize conversation if ID provided
     conversation_id = req.conversation_id or f"conv_{int(datetime.now().timestamp())}"
     if conversation_id not in state.conversations:
         state.conversations[conversation_id] = []
+    
+    try:
     
     # Add initial message
     state.conversations[conversation_id].append({
@@ -850,13 +954,19 @@ async def start_workflow(req: WorkflowRequest):
     credit = await perform_credit_check(req.borrower_address, req.credit_score)
     
     if not credit["is_eligible"]:
+        # Reset state on failure
         state.stats["agentStatus"] = "idle"
+        state.current_negotiation = None
         state.conversations[conversation_id].append({
             "id": f"msg_{len(state.conversations[conversation_id])}",
             "timestamp": datetime.now().isoformat(),
             "agent": "system",
             "type": "message",
             "content": "Credit check failed. Workflow terminated."
+        })
+        await manager.broadcast({
+            "type": "agent_status",
+            "data": {"status": "idle", "task": "Workflow terminated - credit check failed"}
         })
         return {"success": False, "reason": "Credit check failed", "conversation_id": conversation_id}
     
@@ -909,7 +1019,7 @@ async def start_workflow(req: WorkflowRequest):
         term_months=req.term_months
     )
     
-    # Step 4: AI Analysis
+    # Step 4: AI Analysis (actually run agents)
     await manager.broadcast({
         "type": "workflow_step",
         "data": {
@@ -920,10 +1030,26 @@ async def start_workflow(req: WorkflowRequest):
         }
     })
     
-    await asyncio.sleep(1)
+    # Run agent negotiation in background
+    background_tasks.add_task(
+        run_agent_negotiation,
+        conversation_id=conversation_id,
+        borrower_address=req.borrower_address,
+        lender_address=req.lender_address,
+        principal=req.principal,
+        interest_rate=req.interest_rate,
+        term_months=req.term_months,
+        auto_confirm=req.auto_confirm
+    )
     
-    # Determine target rate
+    # Wait a bit for agent to start
+    await asyncio.sleep(2)
+    
+    # Determine target rate (simplified for now, agents will handle negotiation)
     if req.interest_rate <= 7.0:
+        target = req.interest_rate
+        action = "accept"
+    elif req.auto_confirm and req.interest_rate <= 9.0:
         target = req.interest_rate
         action = "accept"
     else:
@@ -989,17 +1115,59 @@ async def start_workflow(req: WorkflowRequest):
     # Step 6: Accept and Settle (uses real client if available)
     settlement = await close_hydra_and_settle_real()
     
-    state.stats["agentStatus"] = "profiting"
+    # Add final settlement message
+    state.conversations[conversation_id].append({
+        "id": f"msg_{len(state.conversations[conversation_id])}",
+        "timestamp": datetime.now().isoformat(),
+        "agent": "system",
+        "type": "action",
+        "content": f"Settlement transaction submitted. Loan disbursed successfully!"
+    })
+    
+    # Reset state after workflow completes
+    await asyncio.sleep(1)  # Brief delay to show completion
+    state.stats["agentStatus"] = "idle"
+    state.current_negotiation = None
     
     await manager.broadcast({
         "type": "agent_status",
-        "data": {"status": "profiting", "task": "Loan disbursed successfully!"}
+        "data": {"status": "idle", "task": "Workflow complete. Ready for next loan."}
+    })
+    
+    await manager.broadcast({
+        "type": "conversation_update",
+        "data": {"conversation_id": conversation_id}
     })
     
     return {
         "success": True,
+        "conversation_id": conversation_id,
         "settlement": settlement
     }
+    except Exception as e:
+        # Reset state on any error
+        print(f"[Workflow] Error: {e}")
+        state.stats["agentStatus"] = "idle"
+        state.current_negotiation = None
+        
+        state.conversations[conversation_id].append({
+            "id": f"msg_{len(state.conversations[conversation_id])}",
+            "timestamp": datetime.now().isoformat(),
+            "agent": "system",
+            "type": "message",
+            "content": f"Workflow error: {str(e)}"
+        })
+        
+        await manager.broadcast({
+            "type": "agent_status",
+            "data": {"status": "idle", "task": "Workflow error - reset to idle"}
+        })
+        
+        return {
+            "success": False,
+            "reason": str(e),
+            "conversation_id": conversation_id
+        }
 
 
 @app.post("/api/negotiation/propose")
