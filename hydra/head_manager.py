@@ -211,8 +211,8 @@ if __name__ == "__main__":
     print("Lendora AI - Hydra Head Manager")
     print("=" * 70)
     
-    print("\n⚠️  This requires a running Hydra node at ws://localhost:4001")
-    print("⚠️  Install: https://hydra.family/head-protocol/docs/getting-started\n")
+    print("\n[WARNING] This requires a running Hydra node at ws://localhost:4001")
+    print("[WARNING] Install: https://hydra.family/head-protocol/docs/getting-started\n")
     
     # Example usage
     client = HydraClient()
