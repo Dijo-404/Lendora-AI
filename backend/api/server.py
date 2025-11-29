@@ -225,11 +225,15 @@ class ConnectionManager:
             self.connections.remove(ws)
     
     async def broadcast(self, message: dict):
-        for conn in self.connections:
+        # Create a copy of connections to avoid race conditions during iteration
+        connections_copy = self.connections.copy()
+        for conn in connections_copy:
             try:
                 await conn.send_json(message)
             except:
-                pass
+                # Connection might be closed, remove it
+                if conn in self.connections:
+                    self.connections.remove(conn)
 
 manager = ConnectionManager()
 
@@ -1059,14 +1063,16 @@ async def start_workflow(req: WorkflowRequest, background_tasks: BackgroundTasks
     state.stats["agentStatus"] = "negotiating"
     
     # Initialize conversation if ID provided
-    conversation_id = req.conversation_id or f"conv_{int(datetime.now().timestamp())}"
+    conversation_id = req.conversation_id or f"conv_{int(datetime.now().timestamp() * 1000000)}"
     if conversation_id not in state.conversations:
         state.conversations[conversation_id] = []
     
     try:
-        # Add initial message
-        state.conversations[conversation_id].append({
-            "id": f"msg_{len(state.conversations[conversation_id])}",
+        # Add initial message (thread-safe)
+        conversation = state.conversations[conversation_id]
+        msg_id = f"msg_{len(conversation)}"
+        conversation.append({
+            "id": msg_id,
             "timestamp": datetime.now().isoformat(),
             "agent": "system",
             "type": "message",

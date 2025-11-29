@@ -2,95 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
-
-  /* ============================================================================
-   * Foggy Future - Light Theme (Default)
-   * Soft ceramics, muted pastels, gentle gradients
-   * ============================================================================ */
   :root {
-    --background: 240 5% 96%;
-    --foreground: 240 10% 10%;
-
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
-
-    --glass: 240 5% 100% / 0.7;
-    --glass-border: 240 5% 80% / 0.5;
-
-    --primary: 258 70% 55%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 258 70% 55%;
-
-    --secondary: 200 80% 55%;
-    --secondary-foreground: 0 0% 100%;
-
-    --agent-pulse: 38 92% 50%;
-    --success: 152 76% 40%;
-    --warning: 38 92% 50%;
-
-    --muted: 240 5% 92%;
-    --muted-foreground: 240 5% 45%;
-
-    --accent: 280 60% 75%;
-    --accent-foreground: 240 10% 10%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5% 85%;
-    --input: 240 5% 90%;
-    --ring: 258 70% 55%;
-
-    --radius: 1rem;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.75rem;
   }
 
-  /* ============================================================================
-   * Cyber-Noir - Dark Theme
-   * Deep charcoal, neon accents, glass morphism
-   * ============================================================================ */
   .dark {
-    --background: 0 0% 2%;
-    --foreground: 0 0% 98%;
-
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 98%;
-
-    --glass: 0 0% 100% / 0.03;
-    --glass-border: 0 0% 100% / 0.08;
-
-    --primary: 258 90% 66%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 258 90% 66%;
-
-    --secondary: 187 100% 50%;
-    --secondary-foreground: 0 0% 0%;
-
-    --agent-pulse: 38 92% 50%;
-    --success: 152 82% 50%;
-    --warning: 38 92% 50%;
-
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
-
-    --accent: 258 90% 66%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 100% / 0.08;
-    --input: 0 0% 100% / 0.08;
-    --ring: 187 100% 50%;
-
-    --radius: 1rem;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
   }
 }
 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Glass UI Components */
 @layer utilities {
   .glass-card {
     @apply bg-white/[0.05] backdrop-blur-xl border border-white/[0.1] shadow-xl;
@@ -112,115 +81,71 @@ All colors MUST be HSL.
 
   .glass-card-glow:hover {
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15),
-      0 12px 48px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      0 0 20px rgba(187, 100, 255, 0.1);
-  }
-
-  .gradient-glow {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-  }
-
-  .gradient-border {
-    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-    padding: 2px;
-    border-radius: inherit;
-  }
-
-  .gradient-border>* {
-    background: hsl(var(--background));
-    border-radius: inherit;
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      0 20px 40px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .dot-pattern {
-    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 
-  .shimmer {
-    background: linear-gradient(90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.05) 50%,
-        rgba(255, 255, 255, 0) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 2s infinite;
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
 
-  @keyframes shimmer {
-    0% {
-      background-position: -200% 0;
-    }
-
-    100% {
-      background-position: 200% 0;
-    }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 
-  @keyframes gradient-shift {
-
-    0%,
-    100% {
-      background-position: 0% 50%;
-    }
-
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
-  @keyframes pulse-glow {
-
-    0%,
-    100% {
-      box-shadow: 0 0 20px rgba(187, 100, 255, 0.3);
-    }
-
-    50% {
-      box-shadow: 0 0 40px rgba(187, 100, 255, 0.6);
-    }
-  }
-
-  .text-gradient {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
-  }
-
-  .hero-gradient {
-    background: linear-gradient(135deg,
-        hsl(var(--primary) / 0.1) 0%,
-        hsl(var(--secondary) / 0.1) 100%);
-    background-size: 200% 200%;
-    animation: gradient-shift 15s ease infinite;
-  }
-
-  .wallet-card {
-    @apply glass-card p-4 rounded-xl transition-all duration-300;
-  }
-
-  .wallet-card:hover {
-    @apply border-primary/50 shadow-lg;
-    transform: translateY(-2px);
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
   }
+  50% {
+    transform: translateY(-20px);
+  }
+}
 
-  body {
-    @apply bg-background text-foreground;
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
   }
+  to {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted/30;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/30 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/50;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles */
+.focus-ring:focus-visible {
+  @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
 }

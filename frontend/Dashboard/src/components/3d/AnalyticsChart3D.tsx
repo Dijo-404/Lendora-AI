@@ -1,6 +1,6 @@
 /**
- * Lendora AI - Holographic 3D Analytics Charts
- * Immersive 3D visualization of loan analytics
+ * Lendora AI - 3D Analytics Charts
+ * Holographic 3D visualization for data analytics
  */
 
 import { useRef, useMemo } from 'react';
@@ -41,16 +41,16 @@ export function AnalyticsChart3D({
     // Normalize data
     const normalizedData = useMemo(() => {
         if (data.length === 0) return [];
-        
+
         const maxValue = Math.max(...data.map(d => d.value));
         const minValue = Math.min(...data.map(d => d.value));
         const range = maxValue - minValue || 1;
-        
+
         return data.map((point, index) => {
             const normalizedY = ((point.value - minValue) / range) * height;
             const x = (index / (data.length - 1 || 1)) * width - width / 2;
             const z = point.z ? point.z * depth : 0;
-            
+
             return {
                 x,
                 y: normalizedY,
@@ -63,10 +63,10 @@ export function AnalyticsChart3D({
 
     useFrame((state) => {
         if (!groupRef.current || !animated) return;
-        
+
         // Subtle rotation
         groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.1;
-        
+
         // Holographic glow effect
         if (materialRef.current) {
             const intensity = Math.sin(state.clock.elapsedTime * 2) * 0.3 + 0.7;
@@ -80,7 +80,7 @@ export function AnalyticsChart3D({
         <group ref={groupRef} position={[0, 0, 0]}>
             {/* Base grid */}
             <gridHelper args={[width, 10, color, color]} />
-            
+
             {/* Chart visualization based on type */}
             {type === 'line' && (
                 <>
@@ -102,7 +102,7 @@ export function AnalyticsChart3D({
                     ))}
                 </>
             )}
-            
+
             {type === 'bar' && normalizedData.map((point, i) => (
                 <group key={i} position={[point.x, 0, point.z]}>
                     <mesh position={[0, point.y / 2, 0]}>
@@ -128,7 +128,7 @@ export function AnalyticsChart3D({
                     )}
                 </group>
             ))}
-            
+
             {type === 'scatter' && normalizedData.map((point, i) => (
                 <mesh key={i} position={[point.x, point.y, point.z]}>
                     <sphereGeometry args={[0.08, 16, 16]} />
@@ -139,7 +139,7 @@ export function AnalyticsChart3D({
                     />
                 </mesh>
             ))}
-            
+
             {/* Holographic effect - glowing lines */}
             <mesh position={[0, height / 2, 0]}>
                 <planeGeometry args={[width, 0.01]} />
@@ -154,4 +154,3 @@ export function AnalyticsChart3D({
         </group>
     );
 }
-

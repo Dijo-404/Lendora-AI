@@ -1,6 +1,6 @@
 /**
- * Lendora AI - Dashboard Layout
- * Complete workflow visualization with real-time updates
+ * Lendora AI - Enhanced Dashboard Layout
+ * Complete workflow visualization with real-time updates and rich UI
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -8,13 +8,23 @@ import { Canvas } from '@react-three/fiber';
 import { AgentStatusOrb } from '@/components/3d/AgentStatusOrb';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { motion, AnimatePresence } from 'framer-motion';
-import CountUp from 'react-countup';
-import { Activity, TrendingUp, Zap, Shield, CheckCircle2, Circle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { AuroraBackground } from '@/components/ui/AuroraBackground';
-import { EnhancedLoanForm, LoanFormData } from '@/components/dashboard/EnhancedLoanForm';
+import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AgentConversation } from '@/components/dashboard/AgentConversation';
+import { AnalyticsCharts } from '@/components/dashboard/AnalyticsCharts';
+import { WorkflowVisualizer } from '@/components/dashboard/WorkflowVisualizer';
+import {
+    Shield,
+    Sparkles,
+    Activity,
+    TrendingUp,
+    CheckCircle2,
+    Zap,
+    Crown,
+    Star
+} from 'lucide-react';
 
 interface DashboardStats {
     totalBalance: number;
@@ -57,8 +67,7 @@ export default function DashboardLayout() {
     const [workflowSteps, setWorkflowSteps] = useState<WorkflowStep[]>([]);
     const [trades, setTrades] = useState<Trade[]>([]);
     const [isWorkflowRunning, setIsWorkflowRunning] = useState(false);
-    const [ws, setWs] = useState<WebSocket | null>(null);
-    const [currentConversationId, setCurrentConversationId] = useState<string | undefined>();
+    const [, setWs] = useState<WebSocket | null>(null);
 
     // Initial workflow steps
     const initialSteps: WorkflowStep[] = [
@@ -70,17 +79,15 @@ export default function DashboardLayout() {
         { step: 6, name: 'Aiken Validator Settlement', status: 'pending' },
     ];
 
-    // Define handleWsMessage before useEffect to avoid hoisting issues
+    // WebSocket message handler
     const handleWsMessage = useCallback((message: { type: string; data: Record<string, unknown> }) => {
         switch (message.type) {
             case 'stats_update':
                 setStats(message.data as unknown as DashboardStats);
                 break;
-
             case 'agent_status':
                 setStats(prev => ({ ...prev, agentStatus: (message.data as { status: string }).status as DashboardStats['agentStatus'] }));
                 break;
-
             case 'workflow_step': {
                 const stepData = message.data as unknown as WorkflowStep;
                 setWorkflowSteps(prev => {
@@ -93,24 +100,15 @@ export default function DashboardLayout() {
                 });
                 break;
             }
-
             case 'workflow_complete':
                 setIsWorkflowRunning(false);
                 fetchTrades();
-                break;
-
-            case 'conversation_update':
-                // Trigger conversation refresh - AgentConversation component polls for updates
-                console.log('[WS] Conversation update received:', message.data);
                 break;
         }
     }, []);
 
     // WebSocket connection
     useEffect(() => {
-        // Only connect WebSocket if we have a wallet connection
-        // This prevents the model from running before user connects wallet
-        // Construct WebSocket URL from API URL if WS_URL not set
         const wsUrl = WS_URL || (API_URL.replace(/^http/, 'ws') + '/ws');
         const websocket = new WebSocket(wsUrl);
 
@@ -144,7 +142,7 @@ export default function DashboardLayout() {
         };
     }, [handleWsMessage]);
 
-    // Fetch initial data (only stats, not triggering workflows)
+    // Fetch initial data
     useEffect(() => {
         fetchStats();
         fetchTrades();
@@ -176,58 +174,7 @@ export default function DashboardLayout() {
         }
     };
 
-    const startWorkflow = async (formData: LoanFormData) => {
-        setWorkflowSteps(initialSteps);
-        setIsWorkflowRunning(true);
-
-        // Generate conversation ID
-        const conversationId = `conv_${Date.now()}`;
-        setCurrentConversationId(conversationId);
-
-        // Clear previous messages to show new conversation
-        // The AgentConversation component will fetch new messages
-
-        try {
-            // Prepare request based on role
-            const requestBody = {
-                role: formData.role,
-                borrower_address: formData.role === 'borrower' ? formData.walletAddress : formData.borrower_address || 'addr1_borrower',
-                lender_address: formData.role === 'lender' ? formData.walletAddress : formData.lender_address || 'addr1_lender',
-                credit_score: formData.credit_score || 750,
-                principal: formData.principal,
-                interest_rate: formData.interest_rate,
-                term_months: formData.term_months,
-                stablecoin: formData.stablecoin,
-                auto_confirm: formData.autoConfirm,
-                conversation_id: conversationId
-            };
-
-            const res = await fetch(`${API_URL}/api/workflow/start`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
-
-            const data = await res.json();
-
-            if (data.success) {
-                // Update conversation ID if returned
-                if (data.conversation_id) {
-                    setCurrentConversationId(data.conversation_id);
-                }
-                // Mark all steps complete
-                setWorkflowSteps(prev => prev.map(s => ({ ...s, status: 'completed' as const })));
-            }
-        } catch (err) {
-            console.error('Workflow error:', err);
-            // Demo mode - simulate workflow
-            await simulateWorkflow(formData);
-        }
-
-        setIsWorkflowRunning(false);
-    };
-
-    const simulateWorkflow = async (formData: LoanFormData) => {
+    const simulateWorkflow = async () => {
         for (let i = 0; i < initialSteps.length; i++) {
             setWorkflowSteps(prev => prev.map((s, idx) => ({
                 ...s,
@@ -242,10 +189,10 @@ export default function DashboardLayout() {
             id: `trade_${Date.now()}`,
             timestamp: new Date().toISOString(),
             type: 'loan_accepted',
-            principal: formData.principal,
-            interestRate: formData.interest_rate - 1.5,
-            originalRate: formData.interest_rate,
-            profit: formData.principal * 0.015,
+            principal: 1000,
+            interestRate: 7.5,
+            originalRate: 8.5,
+            profit: 15,
             status: 'completed'
         };
         setTrades(prev => [newTrade, ...prev]);
@@ -256,17 +203,6 @@ export default function DashboardLayout() {
             totalProfit: prev.totalProfit + newTrade.profit!,
             agentStatus: 'profiting'
         }));
-    };
-
-    const getStepIcon = (status: string) => {
-        switch (status) {
-            case 'completed':
-                return <CheckCircle2 className="w-5 h-5 text-green-500" />;
-            case 'processing':
-                return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
-            default:
-                return <Circle className="w-5 h-5 text-gray-400" />;
-        }
     };
 
     return (
@@ -280,7 +216,7 @@ export default function DashboardLayout() {
                         size="icon"
                         className="backdrop-blur-xl bg-card/50"
                     >
-                        {theme === 'dark' ? 'Light' : 'Dark'}
+                        {theme === 'dark' ? <Star className="w-4 h-4" /> : <Crown className="w-4 h-4" />}
                     </Button>
                 </div>
 
@@ -290,18 +226,47 @@ export default function DashboardLayout() {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
-                        Lendora AI
-                    </h1>
-                    <p className="text-muted-foreground text-lg">
-                        Privacy-First DeFi Lending on Cardano
-                    </p>
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 rounded-xl bg-primary/10 relative">
+                            <Shield className="w-8 h-8 text-primary" />
+                            <motion.div
+                                className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background"
+                                animate={{ scale: [1, 1.2, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                            />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                                    Lendora AI
+                                </h1>
+                                <motion.div
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                                >
+                                    <Sparkles className="w-6 h-6 text-primary" />
+                                </motion.div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <p className="text-muted-foreground text-lg">
+                                    Privacy-First DeFi Lending on Cardano
+                                </p>
+                                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                                    Live
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </motion.div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    {/* Agent Status */}
-                    <Card className="glass-card p-4 md:col-span-2 md:row-span-2">
+                {/* Enhanced Dashboard Metrics */}
+                <DashboardMetrics stats={stats} />
+
+                {/* Main Content Grid */}
+                <div className="grid lg:grid-cols-3 gap-6 mb-8">
+                    {/* Agent Status - 3D */}
+                    <Card className="glass-card p-4 lg:col-span-1">
                         <div className="flex items-center gap-2 mb-4">
                             <Activity className="w-5 h-5 text-primary" />
                             <h3 className="font-semibold">Agent Status</h3>
@@ -310,7 +275,7 @@ export default function DashboardLayout() {
                                     'bg-gray-400'
                                 }`} />
                         </div>
-                        <div className="h-40 md:h-48">
+                        <div className="h-48">
                             <Canvas camera={{ position: [0, 0, 5] }}>
                                 <ambientLight intensity={0.5} />
                                 <AgentStatusOrb status={stats.agentStatus} />
@@ -321,92 +286,27 @@ export default function DashboardLayout() {
                         </p>
                     </Card>
 
-                    {/* Total Balance */}
-                    <Card className="glass-card p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <TrendingUp className="w-4 h-4 text-green-500" />
-                            <span className="text-sm text-muted-foreground">Balance</span>
-                        </div>
-                        <p className="text-2xl md:text-3xl font-bold">
-                            <CountUp end={stats.totalBalance} duration={2} decimals={2} preserveValue />
-                            <span className="text-sm ml-1">ADA</span>
-                        </p>
-                    </Card>
-
-                    {/* Active Loans */}
-                    <Card className="glass-card p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Zap className="w-4 h-4 text-blue-500" />
-                            <span className="text-sm text-muted-foreground">Active Loans</span>
-                        </div>
-                        <p className="text-2xl md:text-3xl font-bold">
-                            <CountUp end={stats.activeLoans} duration={1} preserveValue />
-                        </p>
-                    </Card>
-
-                    {/* Total Profit */}
-                    <Card className="glass-card p-4 md:col-span-2">
-                        <div className="flex items-center gap-2 mb-2">
-                            <Shield className="w-4 h-4 text-purple-500" />
-                            <span className="text-sm text-muted-foreground">Total Profit</span>
-                        </div>
-                        <p className="text-2xl md:text-3xl font-bold text-green-500">
-                            +<CountUp end={stats.totalProfit} duration={2} decimals={2} preserveValue /> ADA
-                        </p>
-                    </Card>
+                    {/* Workflow Visualizer */}
+                    <div className="lg:col-span-2">
+                        <WorkflowVisualizer
+                            steps={workflowSteps.length > 0 ? workflowSteps : initialSteps}
+                            isRunning={isWorkflowRunning}
+                            onStepClick={(step) => console.log('Step clicked:', step)}
+                            showDetails={true}
+                        />
+                    </div>
                 </div>
 
-                {/* Workflow Section */}
+                {/* Agent Conversations and Analytics */}
                 <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    {/* Enhanced Loan Form */}
-                    <EnhancedLoanForm
-                        onSubmit={startWorkflow}
-                        isSubmitting={isWorkflowRunning}
-                    />
-
-                    {/* Workflow Steps */}
-                    <Card className="glass-card p-6">
-                        <h3 className="text-xl font-bold mb-4">Workflow Progress</h3>
-
-                        <div className="space-y-3">
-                            <AnimatePresence>
-                                {(workflowSteps.length > 0 ? workflowSteps : initialSteps).map((step, idx) => (
-                                    <motion.div
-                                        key={step.step}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.1 }}
-                                        className={`flex items-center gap-3 p-3 rounded-lg ${step.status === 'completed' ? 'bg-green-500/10 border border-green-500/30' :
-                                            step.status === 'processing' ? 'bg-blue-500/10 border border-blue-500/30' :
-                                                'bg-muted/30 border border-border'
-                                            }`}
-                                    >
-                                        {getStepIcon(step.status)}
-                                        <div className="flex-1">
-                                            <p className="font-medium text-sm">{step.name}</p>
-                                            {step.details && step.status === 'completed' && (
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {JSON.stringify(step.details).slice(0, 50)}...
-                                                </p>
-                                            )}
-                                        </div>
-                                        {step.status === 'completed' && (
-                                            <span className="text-xs text-green-500">Done</span>
-                                        )}
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </div>
-                    </Card>
-                </div>
-
-                {/* Agent Conversations */}
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    <AgentConversation conversationId={currentConversationId} />
+                    <AgentConversation conversationId={undefined} />
 
                     {/* Recent Trades */}
                     <Card className="glass-card p-6">
-                        <h3 className="text-xl font-bold mb-4">Recent Trades</h3>
+                        <div className="flex items-center gap-2 mb-4">
+                            <TrendingUp className="w-5 h-5 text-primary" />
+                            <h3 className="text-xl font-bold">Recent Trades</h3>
+                        </div>
 
                         <div className="space-y-3">
                             {trades.length > 0 ? trades.slice(0, 5).map((trade, idx) => (
@@ -415,7 +315,7 @@ export default function DashboardLayout() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: idx * 0.1 }}
-                                    className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border"
+                                    className="flex items-center justify-between p-4 rounded-lg bg-muted/30 border border-border hover:border-primary/30 transition-colors cursor-pointer"
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -443,15 +343,66 @@ export default function DashboardLayout() {
                                     </div>
                                 </motion.div>
                             )) : (
-                                <p className="text-center text-muted-foreground py-8">
-                                    No trades yet. Start a workflow to see results here.
-                                </p>
+                                <div className="text-center py-8">
+                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/30 flex items-center justify-center">
+                                        <TrendingUp className="w-8 h-8 text-muted-foreground" />
+                                    </div>
+                                    <p className="text-muted-foreground mb-2">No trades yet</p>
+                                    <p className="text-xs text-muted-foreground">Start a workflow to see results here</p>
+                                </div>
                             )}
                         </div>
                     </Card>
                 </div>
 
+                {/* Comprehensive Analytics Charts */}
+                <AnalyticsCharts />
 
+                {/* Quick Actions */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="mt-8"
+                >
+                    <Card className="glass-card p-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-primary/10">
+                                    <Zap className="w-6 h-6 text-primary" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold">Quick Actions</h3>
+                                    <p className="text-sm text-muted-foreground">Start a new loan workflow or manage existing ones</p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3">
+                                <Button
+                                    onClick={() => {
+                                        setWorkflowSteps(initialSteps);
+                                        setIsWorkflowRunning(true);
+                                        setTimeout(() => simulateWorkflow(), 1000);
+                                    }}
+                                    disabled={isWorkflowRunning}
+                                    className="bg-primary hover:bg-primary/90"
+                                >
+                                    {isWorkflowRunning ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Zap className="w-4 h-4 mr-2" />
+                                            Start Workflow
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                </motion.div>
             </div>
         </AuroraBackground>
     );

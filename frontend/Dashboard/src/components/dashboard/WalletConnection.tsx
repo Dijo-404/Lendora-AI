@@ -1,6 +1,6 @@
 /**
  * Lendora AI - Enhanced Wallet Connection
- * Supports Nami and manual address input
+ * Supports Nami and manual address input with rich UI
  */
 
 import { useState } from 'react';
@@ -8,8 +8,8 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useWallet } from '@/hooks/useWallet';
-import { Wallet, Copy, Check, Edit2, X } from 'lucide-react';
+import { useWallet } from '@/hooks/use-wallet';
+import { Wallet, Copy, Check, Edit2, X, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface WalletConnectionProps {
@@ -36,7 +36,7 @@ export function WalletConnection({ onAddressChange, defaultAddress }: WalletConn
     const [isManualMode, setIsManualMode] = useState(!defaultAddress);
     const [copied, setCopied] = useState(false);
 
-    const handleConnect = async (walletName: 'nami' | 'eternl' | 'yoroi' | 'flint' | 'typhon' | 'gerowallet') => {
+    const handleConnect = async (walletName: any) => {
         try {
             await connect(walletName);
             setIsManualMode(false);
@@ -77,7 +77,7 @@ export function WalletConnection({ onAddressChange, defaultAddress }: WalletConn
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-muted-foreground">Connected Wallet</p>
-                            <p className="font-medium">{wallet?.name || 'Unknown'}</p>
+                            <p className="font-medium">{wallet?.displayName || 'Unknown'}</p>
                         </div>
                         <Button
                             variant="outline"
@@ -132,19 +132,52 @@ export function WalletConnection({ onAddressChange, defaultAddress }: WalletConn
                             {installedWallets
                                 .filter(w => w.installed)
                                 .map((wallet) => (
-                                    <Button
+                                    <motion.div
                                         key={wallet.name}
-                                        variant={wallet.name === 'eternl' ? 'default' : 'outline'}
-                                        onClick={() => handleConnect(wallet.name)}
-                                        disabled={isConnecting}
-                                        className={`justify-start ${wallet.name === 'eternl' ? 'bg-primary text-primary-foreground' : ''}`}
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
                                     >
-                                        <Wallet className="w-4 h-4 mr-2" />
-                                        {wallet.displayName}
-                                        {wallet.name === 'eternl' && (
-                                            <span className="ml-auto text-xs opacity-75">Recommended</span>
-                                        )}
-                                    </Button>
+                                        <Button
+                                            variant={wallet.name === 'eternl' ? 'default' : 'outline'}
+                                            onClick={() => handleConnect(wallet.name)}
+                                            disabled={isConnecting}
+                                            className={`justify-start relative overflow-hidden group ${
+                                                wallet.name === 'eternl' ? 'bg-primary text-primary-foreground shadow-lg' : 'hover:border-primary/50'
+                                            }`}
+                                        >
+                                            {/* Animated background */}
+                                            <motion.div
+                                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                                                initial={{ x: '-100%' }}
+                                                whileHover={{ x: '100%' }}
+                                                transition={{ duration: 0.6 }}
+                                            />
+
+                                            <div className="flex items-center gap-3 relative z-10">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                                    wallet.name === 'eternl' ? 'bg-white/20' : 'bg-primary/10'
+                                                }`}>
+                                                    <Wallet className={`w-4 h-4 ${
+                                                        wallet.name === 'eternl' ? 'text-white' : 'text-primary'
+                                                    }`} />
+                                                </div>
+                                                <div className="text-left">
+                                                    <div className="font-medium">{wallet.displayName}</div>
+                                                    {wallet.name === 'eternl' && (
+                                                        <div className="text-xs opacity-75 flex items-center gap-1">
+                                                            <Star className="w-3 h-3" />
+                                                            Recommended
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {wallet.name === 'eternl' && (
+                                                    <div className="ml-auto">
+                                                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Button>
+                                    </motion.div>
                                 ))}
                         </div>
                         {installedWallets.filter(w => w.installed).length === 0 && (
@@ -202,4 +235,3 @@ export function WalletConnection({ onAddressChange, defaultAddress }: WalletConn
         </Card>
     );
 }
-
