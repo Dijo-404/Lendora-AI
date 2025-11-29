@@ -1,4 +1,4 @@
-# 🚀 Lendora AI
+# Lendora AI
 
 > **Privacy-First DeFi Lending on Cardano 2025 with Immersive 3D Interface**
 
@@ -6,7 +6,7 @@ Lendora is a next-generation decentralized lending protocol where AI agents nego
 
 ---
 
-## 🎯 The Vision
+## The Vision
 
 Traditional DeFi lending has three major problems:
 
@@ -34,7 +34,7 @@ graph TD
 
 ---
 
-## 🏗️ Full Stack Architecture
+## Full Stack Architecture
 
 ### Backend: The Cardano 2025 Stack
 
@@ -58,26 +58,26 @@ graph TD
 
 ---
 
-## ✨ Features
+## Features
 
 ### Backend
-- 🤖 **Privacy-First AI**: Llama 3 runs locally via Ollama - no data leaves your machine
-- ⚡ **Zero Gas Negotiations**: Unlimited negotiation rounds in Hydra Heads
-- 🔐 **ZK Credit Scoring**: Prove creditworthiness without revealing your score
-- 🎯 **Explainable AI**: Every decision logged with reasoning (XAI)
-- 📡 **Real-Time Updates**: WebSocket support for live agent status
+- **Privacy-First AI**: Llama 3 runs locally via Ollama - no data leaves your machine
+- **Zero Gas Negotiations**: Unlimited negotiation rounds in Hydra Heads
+- **ZK Credit Scoring**: Prove creditworthiness without revealing your score
+- **Explainable AI**: Every decision logged with reasoning (XAI)
+- **Real-Time Updates**: WebSocket support for live agent status
 
 ### Frontend
-- 🎨 **3D Portal Login**: Rotating holographic cube with particle field background
-- 🎭 **Floating Dashboards**: Glassmorphic Bento grid cards with liquid distortion
-- 📊 **Kasane Scroll Effect**: Trade cards tilt in 3D space as you scroll
-- 🌐 **Agent Status Orb**: Pulsing 3D sphere showing real-time AI status
-- 🎬 **Camera Transitions**: Cinematic zoom animations between views
-- 🌓 **Dual Themes**: Cyber-Noir (dark) and Foggy Future (light) palettes
+- **3D Portal Login**: Rotating holographic cube with particle field background
+- **Floating Dashboards**: Glassmorphic Bento grid cards with liquid distortion
+- **Kasane Scroll Effect**: Trade cards tilt in 3D space as you scroll
+- **Agent Status Orb**: Pulsing 3D sphere showing real-time AI status
+- **Camera Transitions**: Cinematic zoom animations between views
+- **Dual Themes**: Cyber-Noir (dark) and Foggy Future (light) palettes
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 See [QUICKSTART.md](./QUICKSTART.md) for detailed instructions.
 
@@ -116,7 +116,7 @@ python agents/borrower_agent.py
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 lendora-ai/
@@ -154,7 +154,7 @@ lendora-ai/
 
 ---
 
-## 🎨 UI Screenshots & Design
+## UI Screenshots & Design
 
 ### Login Portal
 - **3D HeroCube** - Rotating holographic cube (glass in light mode, neon wireframe in dark mode)
@@ -174,7 +174,7 @@ lendora-ai/
 
 ---
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 ### 1. Ollama (for local Llama 3)
 ```bash
@@ -221,7 +221,7 @@ aiken --version
 
 ---
 
-## 🤖 The AI Agent: "Lenny"
+## The AI Agent: "Lenny"
 
 ### Privacy-First Configuration
 
@@ -237,7 +237,7 @@ llama3_llm = ChatOpenAI(
 )
 ```
 
-**✅ Privacy Verified**: No OpenAI GPT-4 - All AI processing happens locally.
+**Privacy Verified**: No OpenAI GPT-4 - All AI processing happens locally.
 
 ### Custom Tools
 
@@ -260,7 +260,7 @@ monitor_loan_offers()
 
 ---
 
-## ⚡ Hydra Head Integration
+## Hydra Head Integration
 
 ### The `HydraClient` Class
 
@@ -284,13 +284,13 @@ client.close_head()
 
 ### Why Hydra?
 
-- ⚡ **Instant finality** - No waiting for blocks
-- 💰 **Zero gas fees** - Negotiate for free
-- 🔒 **Private** - Only participants see the state
+- **Instant finality** - No waiting for blocks
+- **Zero gas fees** - Negotiate for free
+- **Private** - Only participants see the state
 
 ---
 
-## 🔐 Privacy Layer: Midnight
+## Privacy Layer: Midnight
 
 ### Zero-Knowledge Credit Scoring
 
@@ -307,19 +307,19 @@ circuit check_eligibility(
 ```
 
 **What the lender sees:**
-- ✅ `is_eligible: true`
-- ❌ `credit_score: <HIDDEN>`
+- `is_eligible: true`
+- `credit_score: <HIDDEN>`
 
-**Zero-knowledge magic!** 🎩
+**Zero-knowledge magic!**
 
 ---
 
-## 🎯 Smart Contract: Settlement Validator
+## Smart Contract: Settlement Validator
 
 The `lendora.ak` Aiken validator ensures:
 
-1. ✅ Both borrower and lender have signed
-2. ✅ Interest rate is reasonable (0-100%)
+1. Both borrower and lender have signed
+2. Interest rate is reasonable (0-100%)
 
 ```aiken
 validator {
@@ -343,7 +343,7 @@ aiken check
 
 ---
 
-## 📊 Explainable AI (XAI)
+## Explainable AI (XAI)
 
 Every decision Lenny makes is logged to `logs/xai_decisions.jsonl`:
 
@@ -360,7 +360,7 @@ This solves the "black box" problem in AI-driven DeFi.
 
 ---
 
-## 🔄 Full Workflow
+## Full Workflow
 
 ```mermaid
 sequenceDiagram
@@ -386,9 +386,9 @@ sequenceDiagram
 
 ---
 
-## 🚧 Current Status
+## Current Status
 
-### ✅ Backend Implemented
+### Backend Implemented
 - [x] AI agent with local Llama 3
 - [x] Hydra WebSocket client
 - [x] Aiken settlement validator with tests
@@ -397,7 +397,7 @@ sequenceDiagram
 - [x] FastAPI REST API server
 - [x] WebSocket real-time updates
 
-### ✅ Frontend Implemented
+### Frontend Implemented
 - [x] 3D immersive login portal (HeroCube + ParticleField)
 - [x] Floating glassmorphic dashboard (Bento grid)
 - [x] Agent Status Orb (3D pulsing sphere)
@@ -406,7 +406,7 @@ sequenceDiagram
 - [x] API client with WebSocket integration
 - [x] CountUp animations and liquid distortion effects
 
-### 🚧 Future Enhancements
+### Future Enhancements
 - [ ] Connect to actual Hydra node (currently mocked)
 - [ ] Actual Midnight network integration
 - [ ] Real Cardano transaction building (PyCardano)
@@ -418,7 +418,7 @@ sequenceDiagram
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 This is a demonstration project showcasing the Cardano 2025 stack. Feel free to:
 
@@ -429,7 +429,7 @@ This is a demonstration project showcasing the Cardano 2025 stack. Feel free to:
 
 ---
 
-## 📚 Resources
+## Resources
 
 ### Backend/Blockchain
 - [Hydra Documentation](https://hydra.family/head-protocol/docs/)
@@ -447,7 +447,7 @@ This is a demonstration project showcasing the Cardano 2025 stack. Feel free to:
 
 ---
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 This is **educational/experimental software**. Do not use in production without:
 - Proper security audits
@@ -457,9 +457,9 @@ This is **educational/experimental software**. Do not use in production without:
 
 ---
 
-## 📄 License
+## License
 
-MIT License - Build cool things! 🚀
+MIT License - Build cool things!
 
 ---
 
