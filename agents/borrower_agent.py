@@ -23,7 +23,7 @@ from hydra.head_manager import HydraClient
 llama3_llm = ChatOpenAI(
     model="llama3",  # The model name registered in Ollama
     base_url="http://localhost:11434/v1",  # Local Ollama endpoint
-    api_key="NA",  # Not required for local Ollama, but field is mandatory
+    api_key="sk-no-key-required",  # Not required for local Ollama, but field is mandatory
     temperature=0.7,
 )
 
