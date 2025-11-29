@@ -1,0 +1,59 @@
+services:
+  # ============================================================================
+  # Cardano Node (Devnet)
+  # ============================================================================
+  cardano-node:
+    image: ghcr.io/intersectmbo/cardano-node:8.9.2
+    environment:
+      - NETWORK=devnet
+    ports:
+      - "3001:3001"
+    volumes:
+      - node-data:/data
+      - node-ipc:/ipc
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f 127.0.0.1:12798/metrics | grep cardano_node_metrics_blockNum_int || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # Hydra Node (Optional - Comment out if image is not available)
+  # ============================================================================
+  # NOTE: The Hydra Docker image may not be publicly available.
+  # Lendora AI works in MOCK mode by default if Hydra is not available.
+  # To use a real Hydra node, install it manually following docs/HYDRA_SETUP.md
+  #
+  # hydra-node:
+  #   image: ghcr.io/cardano-scaling/hydra-node:0.15.0
+  #   command: >
+  #     --node-id 314 --api-host 0.0.0.0 --api-port 4001 --host 0.0.0.0 --port 5001 --monitoring-port 6001 --hydra-signing-key /keys/hydra.sk --cardano-signing-key /keys/cardano.sk --ledger-protocol-parameters /keys/protocol-parameters.json --testnet-magic 42 --node-socket /ipc/node.socket
+  #   volumes:
+  #     - node-ipc:/ipc
+  #     - ./hydra/keys:/keys
+  #   ports:
+  #     - "4001:4001" # WebSocket API
+  #     - "5001:5001" # P2P
+  #     - "6001:6001" # Monitoring
+  #   depends_on:
+  #     cardano-node:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+  # ============================================================================
+  # Hydra TUI (Optional Monitoring)
+  # ============================================================================
+  # hydra-tui:
+  #   image: ghcr.io/cardano-scaling/hydra-tui:0.15.0
+  #   command: >
+  #     --connect 0.0.0.0:4001 --cardano-signing-key /keys/cardano.sk --network-id 42 --node-socket /ipc/node.socket
+  #   volumes:
+  #     - node-ipc:/ipc
+  #     - ./hydra/keys:/keys
+  #   profiles:
+  #     - debug
+
+volumes:
+  node-data:
+  node-ipc:

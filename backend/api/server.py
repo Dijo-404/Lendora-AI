@@ -55,6 +55,8 @@ except ImportError as e:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # Note: uvicorn may override PORT env var with command line --port
+    # We'll read it from the app state if available, otherwise default
     port = int(os.getenv("PORT", "8000"))
     host = os.getenv("HOST", "0.0.0.0")
     display_host = "localhost" if host == "0.0.0.0" else host
@@ -65,6 +67,8 @@ async def lifespan(app: FastAPI):
     print(f"REST API:    http://{display_host}:{port}")
     print(f"WebSocket:   ws://{display_host}:{port}/ws")
     print(f"Docs:        http://{display_host}:{port}/docs")
+    print("=" * 70)
+    print("Note: Actual port shown in uvicorn startup message above")
     print("=" * 70)
     
     # Initialize Hydra manager

@@ -6,17 +6,28 @@ Lendora is a next-generation decentralized lending protocol where AI agents nego
 
 ---
 
-## Live Demo
+## Quick Start
+
+Lendora AI works **out of the box** in mock mode - no Hydra node required!
 
 ```bash
-# Start Backend
-cd backend/api && uvicorn server:app --port 8000
+# 1. Start Backend (will auto-detect and use mock Hydra)
+cd backend/api
+uvicorn server:app --host 0.0.0.0 --port 8000
 
-# Start Frontend  
-cd frontend/Dashboard && npm run dev
+# You'll see: "[Hydra] Running in MOCK mode (node not available)"
+# This is normal and expected - everything works perfectly!
 
-# Open: http://localhost:8080/dashboard
+# 2. Start Frontend (in another terminal)
+cd frontend/Dashboard
+npm run dev
+
+# 3. Open browser
+# Frontend: http://localhost:8080
+# Backend API Docs: http://localhost:8000/docs
 ```
+
+**Note:** The system automatically uses **mock Hydra mode** if no Hydra node is available. All features work identically - the only difference is that negotiations are simulated rather than using a real Hydra Head. This is perfect for development, demos, and testing!
 
 ---
 
@@ -151,6 +162,12 @@ pip install -r backend/api/requirements.txt
 cd frontend/Dashboard
 npm install
 cd ../..
+
+# (Optional) Start Cardano Node (for testing)
+# This requires Docker to be installed
+# Note: Hydra node is commented out in docker-compose.yml as the image may not be publicly available
+# Lendora works perfectly in MOCK mode without Hydra
+docker-compose up -d
 ```
 
 ### Running
@@ -159,6 +176,11 @@ cd ../..
 ```bash
 cd backend/api
 uvicorn server:app --host 0.0.0.0 --port 8000
+
+# The backend will automatically:
+# - Try to connect to Hydra node at ws://127.0.0.1:4001
+# - Fall back to MOCK mode if Hydra is not available
+# - You'll see: "[Hydra] Running in MOCK mode (node not available)"
 ```
 
 **Terminal 2 - Frontend:**
@@ -167,20 +189,28 @@ cd frontend/Dashboard
 npm run dev
 ```
 
-**Terminal 3 - AI Agent (Optional):**
+**Terminal 3 - Ollama (if not already running):**
 ```bash
-python agents/borrower_agent.py
+# Check if Ollama is running
+ollama list
+
+# If not running, start it:
+ollama serve
 ```
+
+**Note:** The AI agents are integrated into the backend workflow - you don't need to run them separately. They'll be invoked automatically when you start a loan workflow from the dashboard.
 
 ### URLs
 
-| Service | URL |
-|---------|-----|
-| Frontend Login | http://localhost:8080 |
-| Frontend Dashboard | http://localhost:8080/dashboard |
-| Backend API | http://localhost:8000 |
-| API Documentation | http://localhost:8000/docs |
-| Ollama | http://localhost:11434 |
+| Service | URL | Notes |
+|---------|-----|-------|
+| Frontend Login | http://localhost:8080 | Auto-detects available port (8080, 8081, etc.) |
+| Frontend Dashboard | http://localhost:8080/dashboard | Same as above |
+| Backend API | http://localhost:8000 | Configurable via `PORT` env var |
+| API Documentation | http://localhost:8000/docs | Swagger UI |
+| WebSocket | ws://localhost:8000/ws | Real-time updates |
+| Ollama | http://localhost:11434 | LLM API (must be running) |
+| Hydra Node | ws://127.0.0.1:4001 | Optional (uses mock mode if unavailable) |
 
 ### First Time Setup
 
@@ -193,14 +223,17 @@ python agents/borrower_agent.py
    ```bash
    # Terminal 1: Backend
    cd backend/api
-   uvicorn server:app --port 8000
+   uvicorn server:app --host 0.0.0.0 --port 8000
+   # You'll see: "[Hydra] Running in MOCK mode" - this is normal!
    
    # Terminal 2: Frontend
    cd frontend/Dashboard
    npm run dev
+   # Will start on http://localhost:8080 (or 8081 if 8080 is busy)
    
    # Terminal 3: Ollama (if not already running)
-   ollama serve
+   # Check first: ollama list
+   # If needed: ollama serve
    ```
 
 3. **Connect Wallet:**
@@ -531,9 +564,10 @@ disconnect();
 - [x] Complete workflow (Midnight -> Hydra -> Aiken)
 - [x] AI Agent with local Llama 3 (CrewAI + Ollama) - Lazy loading (no auto-start)
 - [x] Lender Agent counterpart (Luna)
-- [x] Hydra Head Manager (real node support + mock fallback)
+- [x] Hydra Head Manager (real node support + **automatic mock fallback**)
+- [x] **Mock Hydra Mode** - Works perfectly without Hydra node (default)
 - [x] Aiken settlement validator with tests
-- [x] Midnight ZK credit check circuit
+- [x] Midnight ZK credit check circuit (mock)
 - [x] XAI decision logging
 - [x] FastAPI REST + WebSocket server
 - [x] 3D immersive dashboard
@@ -547,15 +581,61 @@ disconnect();
 - [x] Mobile-optimized particles
 - [x] Dual themes (Cyber-Noir / Foggy Future)
 - [x] Manual address entry option
+- [x] State management - Proper reset between workflows
+- [x] Error handling - Graceful fallbacks and recovery
 
 ### Future Enhancements
 
-- [ ] Connect to actual Hydra node
+- [ ] Connect to actual Hydra node (Docker image not publicly available - see `docs/HYDRA_SETUP.md` for manual setup)
 - [ ] Actual Midnight network integration
 - [ ] Real Cardano tx building (PyCardano)
 - [ ] Holographic 3D analytics charts
 - [ ] Oracle integration for credit scores
 - [ ] Multi-agent negotiation scenarios
+
+---
+
+## Hydra Node Status
+
+### Mock Mode (Default - Recommended)
+
+Lendora AI runs in **mock mode** by default when no Hydra node is available. This is the recommended setup for:
+- Development and testing
+- Demos and presentations
+- Learning the system
+
+**How it works:**
+- Backend tries to connect to `ws://127.0.0.1:4001` on startup
+- If connection fails, automatically switches to mock mode
+- All features work identically - negotiations are simulated
+- No Docker or Hydra installation required!
+
+**You'll see this in logs:**
+```
+[Hydra] Running in MOCK mode (node not available)
+```
+
+This is **normal and expected** - the system is working correctly!
+
+### Real Hydra Node (Advanced)
+
+If you want to use a real Hydra node:
+
+1. **Option 1: Manual Installation** (see `docs/HYDRA_SETUP.md`)
+   ```bash
+   # Install via Nix
+   nix develop github:input-output-hk/hydra
+   
+   # Or download binaries from:
+   # https://github.com/input-output-hk/hydra/releases
+   ```
+
+2. **Option 2: Docker** (if image becomes available)
+   - Uncomment `hydra-node` service in `docker-compose.yml`
+   - Ensure you have the required keys in `./hydra/keys/`
+   - Run: `docker-compose up -d`
+
+**Note:** The Hydra Docker image (`ghcr.io/cardano-scaling/hydra-node:0.15.0`) may not be publicly available. Manual installation is recommended for now.
 
 ---
 
@@ -578,13 +658,22 @@ npm run build
 
 ### Environment Variables
 
-Create `.env` in project root:
+Create `.env` in project root (optional - defaults work fine):
 
 ```env
+# Backend
 OLLAMA_BASE_URL=http://localhost:11434
-HYDRA_NODE_URL=ws://localhost:4001
+HYDRA_NODE_URL=ws://127.0.0.1:4001
+HYDRA_MODE=auto  # Options: auto, real, mock
+PORT=8000
+HOST=0.0.0.0
+
+# Frontend
 VITE_API_URL=http://localhost:8000
+VITE_WS_URL=ws://localhost:8000/ws
 ```
+
+**Note:** If `HYDRA_NODE_URL` is not available, the system automatically uses **MOCK mode**. This is the default behavior and works perfectly for development and demos.
 
 ---
 
