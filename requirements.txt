@@ -16,3 +16,9 @@ websockets>=12.0
 # Utilities
 python-dotenv>=1.0.0
 pydantic>=2.5.0
+
+# PyCardano for real Cardano transaction building
+pycardano>=0.9.0
+
+# Requests for API calls (Midnight, Oracle)
+requests>=2.31.0
