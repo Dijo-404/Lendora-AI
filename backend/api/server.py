@@ -127,12 +127,16 @@ class NegotiationRequest(BaseModel):
     proposed_rate: float
 
 class WorkflowRequest(BaseModel):
+    role: Optional[str] = 'borrower'  # 'borrower' or 'lender'
     borrower_address: str
+    lender_address: str
     credit_score: int
     principal: float
     interest_rate: float
     term_months: int
-    lender_address: str
+    stablecoin: Optional[str] = 'USDT'  # USDT, USDC, DAI, etc.
+    auto_confirm: Optional[bool] = False
+    conversation_id: Optional[str] = None
 
 class HydraConfigRequest(BaseModel):
     node_url: str
@@ -197,6 +201,7 @@ class AppState:
         self.current_negotiation: Optional[Dict] = None
         self.credit_checks: Dict[str, Dict] = {}
         self.trades: List[Dict] = []
+        self.conversations: Dict[str, List[Dict]] = {}  # conversation_id -> messages
         self.stats = {
             "totalBalance": 125450.75,
             "activeLoans": 8,
@@ -806,9 +811,30 @@ async def start_workflow(req: WorkflowRequest):
     """Start the complete lending workflow."""
     state.stats["agentStatus"] = "negotiating"
     
+    # Initialize conversation if ID provided
+    conversation_id = req.conversation_id or f"conv_{int(datetime.now().timestamp())}"
+    if conversation_id not in state.conversations:
+        state.conversations[conversation_id] = []
+    
+    # Add initial message
+    state.conversations[conversation_id].append({
+        "id": f"msg_{len(state.conversations[conversation_id])}",
+        "timestamp": datetime.now().isoformat(),
+        "agent": "system",
+        "type": "message",
+        "content": f"Loan workflow started. Role: {req.role}, Stablecoin: {req.stablecoin}, Principal: {req.principal}"
+    })
+    
     await manager.broadcast({
         "type": "workflow_started",
-        "data": {"borrower": req.borrower_address, "principal": req.principal}
+        "data": {
+            "borrower": req.borrower_address,
+            "lender": req.lender_address,
+            "principal": req.principal,
+            "stablecoin": req.stablecoin,
+            "role": req.role,
+            "conversation_id": conversation_id
+        }
     })
     
     await manager.broadcast({
@@ -821,10 +847,36 @@ async def start_workflow(req: WorkflowRequest):
     
     if not credit["is_eligible"]:
         state.stats["agentStatus"] = "idle"
-        return {"success": False, "reason": "Credit check failed"}
+        state.conversations[conversation_id].append({
+            "id": f"msg_{len(state.conversations[conversation_id])}",
+            "timestamp": datetime.now().isoformat(),
+            "agent": "system",
+            "type": "message",
+            "content": "Credit check failed. Workflow terminated."
+        })
+        return {"success": False, "reason": "Credit check failed", "conversation_id": conversation_id}
     
     # Step 2: Create Loan Offer
     offer_id = f"offer_{int(datetime.now().timestamp())}"
+    
+    # Add agent conversation messages
+    state.conversations[conversation_id].append({
+        "id": f"msg_{len(state.conversations[conversation_id])}",
+        "timestamp": datetime.now().isoformat(),
+        "agent": "system",
+        "type": "message",
+        "content": f"Loan offer created: {req.interest_rate}% interest rate, {req.principal} {req.stablecoin} principal"
+    })
+    
+    state.conversations[conversation_id].append({
+        "id": f"msg_{len(state.conversations[conversation_id])}",
+        "timestamp": datetime.now().isoformat(),
+        "agent": "lenny",
+        "type": "thought",
+        "content": f"Analyzing offer... Market average is 7.5%. This rate is {req.interest_rate - 7.5:.1f}% {'above' if req.interest_rate > 7.5 else 'below'} average.",
+        "confidence": 0.85,
+        "reasoning": "Rate is acceptable but could be negotiated lower" if req.interest_rate > 7.5 else "Rate is favorable"
+    })
     
     await manager.broadcast({
         "type": "workflow_step",
@@ -838,7 +890,8 @@ async def start_workflow(req: WorkflowRequest):
                 "borrower_address": req.borrower_address,
                 "principal": req.principal,
                 "interest_rate": req.interest_rate,
-                "term_months": req.term_months
+                "term_months": req.term_months,
+                "stablecoin": req.stablecoin
             }
         }
     })
@@ -949,6 +1002,24 @@ async def xai_logs(limit: int = 20):
                 except:
                     pass
     return logs[-limit:]
+
+
+@app.get("/api/conversation/{conversation_id}")
+async def get_conversation(conversation_id: str):
+    """Get conversation messages for a workflow."""
+    messages = state.conversations.get(conversation_id, [])
+    return {"conversation_id": conversation_id, "messages": messages}
+
+
+@app.get("/api/conversation/latest")
+async def get_latest_conversation():
+    """Get the most recent conversation."""
+    if not state.conversations:
+        return {"conversation_id": None, "messages": []}
+    
+    latest_id = max(state.conversations.keys(), key=lambda k: len(state.conversations[k]))
+    messages = state.conversations[latest_id]
+    return {"conversation_id": latest_id, "messages": messages}
 
 
 # ============================================================================
