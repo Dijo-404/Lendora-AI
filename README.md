@@ -106,6 +106,12 @@ sequenceDiagram
 ### Frontend Dashboard
 
 - **3D Login Portal** - Holographic cube with particle field
+- **Wallet Connection** - Eternl, Nami, and other CIP-30 wallets
+- **Role Selection** - Choose to be Borrower or Lender
+- **Stablecoin Selection** - USDT, USDC, DAI with liquidity suggestions
+- **Auto-Confirm Toggle** - Let AI auto-accept good deals
+- **Agent Conversations** - Real-time negotiation chat between agents
+- **AI Thoughts** - View Masumi's reasoning and confidence scores
 - **Agent Status Orb** - Real-time 3D sphere (green=profiting, blue=negotiating)
 - **Workflow Visualizer** - Live step-by-step progress
 - **Trade History** - Completed loans with savings shown
@@ -170,10 +176,46 @@ python agents/borrower_agent.py
 
 | Service | URL |
 |---------|-----|
+| Frontend Login | http://localhost:8080 |
 | Frontend Dashboard | http://localhost:8080/dashboard |
 | Backend API | http://localhost:8000 |
 | API Documentation | http://localhost:8000/docs |
 | Ollama | http://localhost:11434 |
+
+### First Time Setup
+
+1. **Install Eternl Wallet:**
+   - Go to [eternl.io](https://eternl.io) and install the browser extension
+   - Create or import a wallet
+   - Make sure it's unlocked
+
+2. **Start Services:**
+   ```bash
+   # Terminal 1: Backend
+   cd backend/api
+   uvicorn server:app --port 8000
+   
+   # Terminal 2: Frontend
+   cd frontend/Dashboard
+   npm run dev
+   
+   # Terminal 3: Ollama (if not already running)
+   ollama serve
+   ```
+
+3. **Connect Wallet:**
+   - Open http://localhost:8080
+   - Click "Connect Wallet"
+   - Select "Eternl" from the list
+   - Approve the connection in the Eternl popup
+   - You'll be redirected to the dashboard
+
+4. **Start Your First Loan:**
+   - Select your role (Borrower or Lender)
+   - Choose a stablecoin (USDT recommended)
+   - Enter loan parameters
+   - Click "Start Loan Request" or "Start Lending"
+   - Watch the AI agents negotiate in real-time!
 
 ---
 
@@ -326,22 +368,158 @@ This solves the "black box" problem - users can audit every AI decision.
 
 ## Wallet Integration
 
-Supports CIP-30 compatible Cardano wallets:
+### Supported Wallets
 
-- Nami
-- Eternl  
-- Yoroi
-- Flint
-- Typhon
-- Gero
+Lendora AI supports all CIP-30 compatible Cardano wallets:
+
+- **Eternl** (Recommended) - Most feature-rich, best compatibility
+- **Nami** - Popular and user-friendly
+- **Yoroi** - Lightweight browser extension
+- **Flint** - Modern wallet with great UX
+- **Typhon** - Advanced features
+- **Gero** - Multi-chain support
+
+### How to Connect Your Wallet
+
+#### Step 1: Install Eternl Wallet (Recommended)
+
+1. **Chrome/Edge/Brave:**
+   - Visit [Eternl.io](https://eternl.io)
+   - Click "Download" → "Chrome Extension"
+   - Click "Add to Chrome" and confirm installation
+
+2. **Firefox:**
+   - Visit [Eternl.io](https://eternl.io)
+   - Click "Download" → "Firefox Extension"
+   - Click "Add to Firefox" and confirm installation
+
+3. **After Installation:**
+   - Click the Eternl extension icon in your browser toolbar
+   - Create a new wallet or import an existing one
+   - **Important:** Make sure the wallet is unlocked before connecting
+
+#### Step 2: Connect to Lendora AI
+
+1. **Start the Application:**
+   ```bash
+   # Terminal 1 - Backend
+   cd backend/api
+   uvicorn server:app --port 8000
+   
+   # Terminal 2 - Frontend
+   cd frontend/Dashboard
+   npm run dev
+   ```
+
+2. **Open the Login Page:**
+   - Navigate to `http://localhost:8080` (or the port shown in terminal)
+   - You'll see the 3D login portal with particle effects
+
+3. **Connect Your Wallet:**
+   - Click the **"Connect Wallet"** button
+   - A dropdown will appear showing available wallets
+   - **Eternl** should appear first with a "Recommended" badge if installed
+   - Click on **"Eternl"** (or your preferred wallet)
+
+4. **Approve Connection:**
+   - Eternl will show a connection popup
+   - Review the connection request
+   - Click **"Approve"** or **"Connect"** in the Eternl popup
+   - The page will automatically navigate to the dashboard
+
+5. **Verify Connection:**
+   - On the dashboard, you should see:
+     - Your wallet address (shortened format)
+     - Your ADA balance
+     - Network (Mainnet/Testnet)
+   - The wallet connection card should show "Connected"
+
+#### Step 3: Using Manual Address Entry (Optional)
+
+If you prefer not to connect a wallet extension:
+
+1. On the login page, click **"Connect Wallet"**
+2. Click the edit icon next to **"Or Enter Address Manually"**
+3. Paste your Cardano address (starts with `addr1...`)
+4. Click **"Start Loan Request"** or **"Start Lending"**
+
+**Note:** Manual address entry works for viewing and testing, but you won't be able to sign transactions.
+
+### Troubleshooting Wallet Connection
+
+#### Issue: "Eternl wallet not found"
+
+**Solutions:**
+1. **Refresh the page** after installing Eternl
+2. **Unlock your Eternl wallet** - Make sure it's not locked
+3. **Check browser permissions** - Ensure extensions are enabled
+4. **Try a different browser** - Some browsers have better extension support
+5. **Check console logs** - Open browser DevTools (F12) → Console tab for detailed errors
+
+#### Issue: "Connection rejected by user"
+
+**Solution:**
+- You clicked "Reject" in the wallet popup. Try connecting again and click "Approve"
+
+#### Issue: "Connection timeout"
+
+**Solutions:**
+1. Make sure Eternl is unlocked
+2. Close and reopen the Eternl extension
+3. Try refreshing the page
+4. Check if other Cardano dApps can connect (to verify Eternl is working)
+
+#### Issue: Wallet not appearing in list
+
+**Solutions:**
+1. **Refresh the page** - Wallets are detected on page load
+2. **Check if extension is enabled** - Go to browser extensions settings
+3. **Try manual address entry** as a workaround
+
+### Wallet Features in Lendora
+
+Once connected, you can:
+
+- **View Balance** - See your ADA balance in real-time
+- **Select Role** - Choose to be a Borrower or Lender
+- **Start Workflows** - Initiate loan requests or lending
+- **Track Transactions** - See all your loan activities
+- **Auto-Confirm** - Enable AI to auto-accept good deals (optional)
+
+### Security Best Practices
+
+1. **Never share your seed phrase** - Lendora never asks for it
+2. **Verify connection requests** - Always check what permissions you're granting
+3. **Use Testnet for testing** - Switch to Testnet in Eternl before testing
+4. **Review transactions** - Always review before signing
+5. **Keep wallet updated** - Update Eternl regularly for security patches
+
+### Code Example
 
 ```typescript
 import { useWallet } from '@/hooks/useWallet';
 
-const { connect, isConnected, address, balance } = useWallet();
+const { 
+    connect, 
+    isConnected, 
+    address, 
+    balance, 
+    network,
+    disconnect 
+} = useWallet();
 
-// Connect to wallet
-await connect('nami');
+// Connect to Eternl
+await connect('eternl');
+
+// Check connection status
+if (isConnected) {
+    console.log(`Connected: ${address}`);
+    console.log(`Balance: ${balance} ADA`);
+    console.log(`Network: ${network}`);
+}
+
+// Disconnect
+disconnect();
 ```
 
 ---
@@ -351,18 +529,24 @@ await connect('nami');
 ### Implemented
 
 - [x] Complete workflow (Midnight -> Hydra -> Aiken)
-- [x] AI Agent with local Llama 3 (CrewAI + Ollama)
+- [x] AI Agent with local Llama 3 (CrewAI + Ollama) - Lazy loading (no auto-start)
 - [x] Lender Agent counterpart (Luna)
-- [x] Hydra Head Manager (mock mode)
+- [x] Hydra Head Manager (real node support + mock fallback)
 - [x] Aiken settlement validator with tests
 - [x] Midnight ZK credit check circuit
 - [x] XAI decision logging
 - [x] FastAPI REST + WebSocket server
 - [x] 3D immersive dashboard
 - [x] Real-time workflow visualization
-- [x] Wallet connection (CIP-30)
+- [x] Wallet connection (CIP-30) - Eternl optimized
+- [x] Role selection (Borrower/Lender)
+- [x] Stablecoin selection with suggestions
+- [x] Auto-confirm toggle for autonomous deals
+- [x] Agent conversation viewer
+- [x] AI thought process display (XAI)
 - [x] Mobile-optimized particles
 - [x] Dual themes (Cyber-Noir / Foggy Future)
+- [x] Manual address entry option
 
 ### Future Enhancements
 
