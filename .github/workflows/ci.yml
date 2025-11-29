@@ -10,7 +10,9 @@ jobs:
   backend-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: false
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
@@ -34,7 +36,9 @@ jobs:
       run:
         working-directory: frontend/Dashboard
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: false
     - name: Set up Node
       uses: actions/setup-node@v4
       with:
@@ -51,14 +55,34 @@ jobs:
   contracts-check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Install and Check Aiken Contracts
+    - uses: actions/checkout@v4
+      with:
+        submodules: false
+    - name: Install Aiken CLI
       run: |
-        # Install Aiken
+        # Install aikup (Aiken installer)
         curl -sSfL https://install.aiken-lang.org | sh
-        export PATH="$HOME/.aiken/bin:$PATH"
         
-        # Verify installation
+        # Add Aiken bin directory to PATH
+        echo "$HOME/.aiken/bin" >> $GITHUB_PATH
+        
+        # Source the environment script to set up PATH
+        source $HOME/.aiken/bin/env || true
+        
+        # Install Aiken using aikup
+        $HOME/.aiken/bin/aikup install latest
+        
+        # Verify Aiken is available
+        export PATH="$HOME/.aiken/bin:$PATH"
+        aiken --version
+    
+    - name: Check Aiken Contracts
+      run: |
+        # Ensure Aiken is in PATH
+        export PATH="$HOME/.aiken/bin:$PATH"
+        source $HOME/.aiken/bin/env || true
+        
+        # Verify Aiken is available
         aiken --version
         
         # Check and build contracts
