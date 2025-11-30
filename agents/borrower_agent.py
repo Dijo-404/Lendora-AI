@@ -51,11 +51,12 @@ def get_llm():
     try:
         # Try to connect to Ollama first
         import requests
-        response = requests.get("http://localhost:11434/api/tags", timeout=2)
+        ollama_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        response = requests.get(f"{ollama_url}/api/tags", timeout=2)
         if response.status_code == 200:
             return LLM(
                 model="ollama/llama3",
-                base_url="http://localhost:11434",
+                base_url=ollama_url,
                 temperature=0.7,
             )
         else:
@@ -66,7 +67,7 @@ def get_llm():
         return LLM(
             model="gpt-3.5-turbo",
             api_key="mock-key-for-development",
-            base_url="http://localhost:11434",  # This will fail gracefully
+            base_url=ollama_url,  # This will fail gracefully
             temperature=0.7,
         )
 

@@ -4,7 +4,7 @@
 
 Lendora is a decentralized lending protocol that uses AI agents to negotiate loans in private Hydra Heads with zero gas fees, employing Midnight zero-knowledge proofs for credit scoring, and featuring an immersive dashboard interface.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Docker Deployment (Recommended)
 
@@ -40,7 +40,7 @@ npm run dev
 # API Docs: http://localhost:8000/docs
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 sequenceDiagram
@@ -79,7 +79,7 @@ sequenceDiagram
 
 Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negotiation → Aiken Settlement
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Backend Components
 
