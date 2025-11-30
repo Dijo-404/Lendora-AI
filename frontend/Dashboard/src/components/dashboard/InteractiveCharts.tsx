@@ -19,7 +19,9 @@ import {
     ResponsiveContainer,
     Legend
 } from 'recharts';
+import type { TooltipProps } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Activity } from 'lucide-react';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface InteractiveChartsProps {
     trades?: Array<{
@@ -29,6 +31,43 @@ interface InteractiveChartsProps {
         profit?: number;
     }>;
 }
+
+interface CustomTooltipProps extends TooltipProps<ValueType, NameType> {
+    payload?: Array<{
+        name: string;
+        value: number;
+        color: string;
+        dataKey: string;
+        payload: any;
+    }>;
+}
+
+// Custom tooltip component defined outside to prevent re-creation on render
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+        return (
+            <Card className="glass-card p-3 border-primary/20">
+                <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground">{payload[0].payload.name}</p>
+                    {payload.map((entry, index: number) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <div
+                                className="w-2 h-2 rounded-full"
+                                style={{ backgroundColor: entry.color }}
+                            />
+                            <span className="text-sm font-medium">
+                                {entry.name}: {Number(entry.value).toFixed(2)}
+                                {entry.dataKey === 'rate' && '%'}
+                                {(entry.dataKey === 'principal' || entry.dataKey === 'profit') && ' ADA'}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+        );
+    }
+    return null;
+};
 
 export function InteractiveCharts({ trades = [] }: InteractiveChartsProps) {
     // Transform trades data for charts
@@ -51,33 +90,6 @@ export function InteractiveCharts({ trades = [] }: InteractiveChartsProps) {
     const rateChange = trades.length >= 2
         ? trades[trades.length - 1].interestRate - trades[trades.length - 2].interestRate
         : 0;
-
-    // Custom tooltip component
-    const CustomTooltip = ({ active, payload }: any) => {
-        if (active && payload && payload.length) {
-            return (
-                <Card className="glass-card p-3 border-primary/20">
-                    <div className="space-y-1">
-                        <p className="text-xs font-medium text-muted-foreground">{payload[0].payload.name}</p>
-                        {payload.map((entry: any, index: number) => (
-                            <div key={index} className="flex items-center gap-2">
-                                <div
-                                    className="w-2 h-2 rounded-full"
-                                    style={{ backgroundColor: entry.color }}
-                                />
-                                <span className="text-sm font-medium">
-                                    {entry.name}: {entry.value.toFixed(2)}
-                                    {entry.dataKey === 'rate' && '%'}
-                                    {(entry.dataKey === 'principal' || entry.dataKey === 'profit') && ' ADA'}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
-            );
-        }
-        return null;
-    };
 
     return (
         <div className="space-y-6">

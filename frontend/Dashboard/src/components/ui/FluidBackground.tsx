@@ -117,7 +117,8 @@ export function FluidBackground({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1 }}
-            className="fixed inset-0 -z-10 overflow-hidden bg-background"
+            className="fixed inset-0 overflow-hidden bg-background"
+            style={{ zIndex: -1 }}
         >
             <canvas
                 ref={canvasRef}

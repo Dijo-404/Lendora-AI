@@ -11,13 +11,13 @@ import { Button } from '@/components/ui/button';
 import { FluidBackground } from '@/components/ui/FluidBackground';
 import { WalletConnection } from '@/components/dashboard/WalletConnection';
 import {
-    Wallet,
     Shield,
     User,
     Building2,
     Sparkles,
     ArrowRight,
-    CheckCircle2
+    CheckCircle2,
+    Wallet
 } from 'lucide-react';
 
 
@@ -75,7 +75,7 @@ export default function LoginGate() {
     return (
         <>
             <FluidBackground variant="cyber-noir" intensity="medium" />
-            <div className="min-h-screen flex items-center justify-center p-4">
+            <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -136,8 +136,8 @@ export default function LoginGate() {
                                             >
                                                 <Card
                                                     className={`glass-card p-4 cursor-pointer transition-all duration-300 hover-lift ${selectedRole === role.id
-                                                            ? 'border-primary shadow-lg shadow-primary/20 shimmer'
-                                                            : 'hover:border-primary/50'
+                                                        ? 'border-primary shadow-lg shadow-primary/20 shimmer'
+                                                        : 'hover:border-primary/50'
                                                         }`}
                                                     onClick={() => handleRoleSelect(role.id as 'borrower' | 'lender')}
                                                 >

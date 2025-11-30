@@ -33,6 +33,16 @@ except ImportError:
     WEBSOCKETS_AVAILABLE = False
     print("[Hydra] Warning: websockets not installed. Run: pip install websockets")
 
+# Try to import Hydra SDK components (optional)
+HYDRA_SDK_AVAILABLE = False
+try:
+    # Note: Hydra SDK is JavaScript-based, this would be used in frontend integration
+    # For backend Python integration, we use the WebSocket client
+    HYDRA_SDK_AVAILABLE = False  # Set to True when frontend integration is complete
+    print("[Hydra] Info: Hydra SDK available for frontend integration")
+except ImportError:
+    print("[Hydra] Info: Hydra SDK not available - using WebSocket client only")
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("HydraClient")

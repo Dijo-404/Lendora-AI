@@ -27,6 +27,7 @@ Agents:
 from .borrower_agent import (
     create_borrower_agent,
     run_complete_workflow,
+    run_integrated_workflow,
     LoanOffer,
     HydraHeadManager,
 )
@@ -36,11 +37,13 @@ from .lender_agent import (
     handle_negotiation_request,
     LendingPool,
 )
+from .masumi.crew import DegenCrew
 
 __all__ = [
     # Borrower Agent (Lenny)
     "create_borrower_agent",
     "run_complete_workflow",
+    "run_integrated_workflow",
     "LoanOffer",
     "HydraHeadManager",
     # Lender Agent (Luna)
@@ -48,4 +51,6 @@ __all__ = [
     "run_lender_agent",
     "handle_negotiation_request",
     "LendingPool",
+    # Masumi Cardano Agent
+    "DegenCrew",
 ]

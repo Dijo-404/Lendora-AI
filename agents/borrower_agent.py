@@ -166,8 +166,17 @@ class MidnightClient:
 
 
 # ============================================================================
-# Hydra Head Manager
+# Integrated Hydra + Masumi Manager
 # ============================================================================
+
+# Import integrated client
+try:
+    from ..hydra.integrated_client import IntegratedHydraMasumiClient
+    INTEGRATED_CLIENT_AVAILABLE = True
+except ImportError:
+    INTEGRATED_CLIENT_AVAILABLE = False
+    print("[BorrowerAgent] Warning: Integrated client not available")
+
 
 class HydraHeadManager:
     """Manages Hydra Head lifecycle for off-chain negotiations."""
@@ -448,6 +457,234 @@ def create_borrower_agent() -> Agent:
 # Complete Workflow
 # ============================================================================
 
+def run_integrated_workflow(
+    borrower_address: str = "addr_test1wz4ydpqxpstg453xlr6v3elpg578ussvk8ezunkj62p9wjq7uw9zq",
+    credit_score: int = 750,  # Private! Never revealed
+    principal: float = 1000,
+    initial_rate: float = 8.5,
+    term_months: int = 12,
+    lender_address: str = "addr1_lender_xyz",
+    use_integrated_client: bool = True
+) -> Dict:
+    """
+    Run the complete Lendora AI workflow with Hydra + Masumi integration.
+
+    This enhanced workflow includes:
+    1. Midnight ZK credit check (privacy-preserving)
+    2. Integrated Hydra + Masumi analysis and negotiation
+    3. AI-powered loan terms optimization
+    4. Real-time blockchain data integration
+
+    Args:
+        borrower_address: Cardano address for borrower analysis
+        credit_score: Private credit score (700+ eligible)
+        principal: Loan amount in ADA
+        initial_rate: Starting interest rate (%)
+        term_months: Loan duration
+        lender_address: Lender's Cardano address
+        use_integrated_client: Whether to use Hydra + Masumi integration
+
+    Returns:
+        Complete workflow result with integrated analysis
+    """
+
+    print("\n" + "=" * 70)
+    print("LENDORA AI - INTEGRATED WORKFLOW (Hydra + Masumi)")
+    print("Privacy-First DeFi Lending with AI Analysis")
+    print("=" * 70)
+
+    # =========================================
+    # STEP 1: Midnight ZK Credit Check (UNCHANGED)
+    # =========================================
+    print("\n" + "-" * 50)
+    print("STEP 1: MIDNIGHT ZK CREDIT CHECK")
+    print("-" * 50)
+
+    credit_result = midnight_client.submit_credit_score(borrower_address, credit_score)
+
+    if not credit_result.is_eligible:
+        print("\n[WORKFLOW] Borrower not eligible. Workflow stopped.")
+        return {"success": False, "reason": "Credit check failed"}
+
+    # =========================================
+    # STEP 2: Lender receives eligibility (UNCHANGED)
+    # =========================================
+    print("\n" + "-" * 50)
+    print("STEP 2: LENDER RECEIVES ELIGIBILITY")
+    print("-" * 50)
+
+    print(f"[Lender] Received from Midnight:")
+    print(f"[Lender]   Borrower: {borrower_address}")
+    print(f"[Lender]   is_eligible: {credit_result.is_eligible}")
+    print(f"[Lender]   ZK Proof: {credit_result.proof_hash}")
+    print(f"[Lender]   (Credit score remains PRIVATE!)")
+
+    # =========================================
+    # STEP 3: Lender creates loan offer (UNCHANGED)
+    # =========================================
+    print("\n" + "-" * 50)
+    print("STEP 3: LENDER CREATES LOAN OFFER")
+    print("-" * 50)
+
+    offer = LoanOffer(
+        lender_address=lender_address,
+        principal=principal,
+        interest_rate=initial_rate,
+        term_months=term_months
+    )
+
+    print(f"[Lender] Loan offer created:")
+    print(f"[Lender]   Principal: {offer.principal} ADA")
+    print(f"[Lender]   Interest Rate: {offer.interest_rate}%")
+    print(f"[Lender]   Term: {offer.term_months} months")
+
+    # =========================================
+    # STEP 4: INTEGRATED HYDRA + MASUMI NEGOTIATION
+    # =========================================
+    print("\n" + "-" * 50)
+    print("STEP 4: INTEGRATED HYDRA + MASUMI NEGOTIATION")
+    print("-" * 50)
+
+    if use_integrated_client and INTEGRATED_CLIENT_AVAILABLE:
+        print("[Workflow] Using integrated Hydra + Masumi client...")
+
+        # Initialize integrated client
+        integrated_client = IntegratedHydraMasumiClient()
+
+        try:
+            # Start the client
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            async def run_negotiation():
+                await integrated_client.start()
+                try:
+                    result = await integrated_client.negotiate_with_ai_analysis(
+                        borrower_address=borrower_address,
+                        lender_address=lender_address,
+                        principal=principal,
+                        initial_rate=initial_rate,
+                        term_months=term_months
+                    )
+                    return result
+                finally:
+                    await integrated_client.stop()
+
+            # Run the negotiation
+            negotiation_result = loop.run_until_complete(run_negotiation())
+
+            # =========================================
+            # STEP 5: AIKEN VALIDATOR VERIFICATION
+            # =========================================
+            print("\n" + "-" * 50)
+            print("STEP 5: AIKEN VALIDATOR VERIFICATION")
+            print("-" * 50)
+
+            aiken_result = aiken_validator.verify_and_settle(negotiation_result.settlement)
+
+            # =========================================
+            # STEP 6: WORKFLOW COMPLETE
+            # =========================================
+            print("\n" + "=" * 70)
+            print("INTEGRATED WORKFLOW COMPLETE!")
+            print("=" * 70)
+
+            print("\nSummary:")
+            print(f"  Borrower: {borrower_address}")
+            print(f"  Credit Check: PASSED (ZK proof, score hidden)")
+            print(f"  Initial Rate: {offer.interest_rate}%")
+            print(f"  Final Rate: {negotiation_result.final_rate}%")
+            print(f"  Savings: {offer.interest_rate - negotiation_result.final_rate}%")
+            print(f"  AI Analysis: COMPLETED")
+            print(f"  Blockchain Data: {len(negotiation_result.blockchain_data)} assets analyzed")
+            print(f"  Settlement: VERIFIED by Aiken")
+            print(f"  Status: LOAN DISBURSED!")
+
+            return {
+                "success": True,
+                "borrower": borrower_address,
+                "credit_check": "passed",
+                "initial_rate": offer.interest_rate,
+                "final_rate": negotiation_result.final_rate,
+                "savings": offer.interest_rate - negotiation_result.final_rate,
+                "principal": principal,
+                "settlement_tx": negotiation_result.settlement.tx_hash,
+                "head_id": negotiation_result.head_id,
+                "masumi_analysis": negotiation_result.masumi_analysis,
+                "blockchain_data": negotiation_result.blockchain_data,
+                "aiken_verification": aiken_result,
+                "integrated_workflow": True
+            }
+
+        except Exception as e:
+            print(f"[Workflow] Integrated negotiation failed: {e}")
+            print("[Workflow] Falling back to standard workflow...")
+            # Fall through to standard workflow
+
+    # =========================================
+    # FALLBACK: STANDARD WORKFLOW
+    # =========================================
+    print("[Workflow] Using standard CrewAI workflow...")
+
+    # STEP 4: AI Agent receives offer and opens Hydra Head
+    print("\n" + "-" * 50)
+    print("STEP 4: AI AGENT (LENNY) RECEIVES OFFER")
+    print("-" * 50)
+
+    print(f"[Lenny] Received loan offer from {lender_address}")
+
+    # Open Hydra Head
+    negotiation = hydra_manager.open_head(offer, borrower_address)
+
+    # STEP 5: AI Agent analyzes and negotiates
+    print("\n" + "-" * 50)
+    print("STEP 5: AI ANALYSIS & NEGOTIATION")
+    print("-" * 50)
+
+    lenny = create_borrower_agent()
+
+    task = Task(
+        description=(
+            f"Negotiate this loan:\n"
+            f"- Principal: {offer.principal} ADA\n"
+            f"- Rate: {offer.interest_rate}%\n"
+            f"- Term: {offer.term_months} months\n\n"
+            f"1. Use AnalyzeLoanTool with: {offer.interest_rate}\n"
+            f"2. Use NegotiateTool with your target rate\n"
+            f"3. Use AcceptAndSettleTool with: yes"
+        ),
+        expected_output="Final settlement result",
+        agent=lenny
+    )
+
+    crew = Crew(agents=[lenny], tasks=[task], verbose=True)
+    result = crew.kickoff()
+
+    # STEP 6: Summary
+    print("\n" + "=" * 70)
+    print("STANDARD WORKFLOW COMPLETE!")
+    print("=" * 70)
+
+    print("\nSummary:")
+    print(f"  Borrower: {borrower_address}")
+    print(f"  Credit Check: PASSED (ZK proof, score hidden)")
+    print(f"  Original Rate: {offer.interest_rate}%")
+    print(f"  Negotiation: Completed in Hydra Head")
+    print(f"  Settlement: Verified by Aiken Validator")
+    print(f"  Status: LOAN DISBURSED!")
+
+    return {
+        "success": True,
+        "borrower": borrower_address,
+        "principal": offer.principal,
+        "original_rate": offer.interest_rate,
+        "credit_check": "passed",
+        "result": str(result),
+        "integrated_workflow": False
+    }
+
+
 def run_complete_workflow(
     borrower_address: str = "addr1_borrower_xyz",
     credit_score: int = 750,  # Private! Never revealed
@@ -597,14 +834,31 @@ if __name__ == "__main__":
     print("  - Llama 3: Local AI analysis (privacy)")
     print("  - Hydra: Off-chain negotiation (speed)")
     print("  - Aiken: On-chain settlement (security)")
+    print("  - Masumi: AI blockchain analysis (NEW!)")
     print("=" * 70)
-    
-    # Run the complete workflow
-    run_complete_workflow(
-        borrower_address="addr1_borrower_alice",
+
+    # Run the integrated workflow (Hydra + Masumi)
+    print("\nRunning INTEGRATED workflow with Hydra + Masumi...")
+    result = run_integrated_workflow(
+        borrower_address="addr_test1wz4ydpqxpstg453xlr6v3elpg578ussvk8ezunkj62p9wjq7uw9zq",
         credit_score=750,  # Private! Never revealed
         principal=1000,
         initial_rate=8.5,
         term_months=12,
-        lender_address="addr1_lender_bob"
+        lender_address="addr1_lender_bob",
+        use_integrated_client=True
     )
+
+    if not result.get("integrated_workflow", False):
+        print("\n" + "=" * 50)
+        print("FALLING BACK TO STANDARD WORKFLOW")
+        print("=" * 50)
+        # Run the standard workflow as fallback
+        run_complete_workflow(
+            borrower_address="addr1_borrower_alice",
+            credit_score=750,
+            principal=1000,
+            initial_rate=8.5,
+            term_months=12,
+            lender_address="addr1_lender_bob"
+        )

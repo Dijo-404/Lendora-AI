@@ -22,3 +22,8 @@ pycardano>=0.9.0
 
 # Requests for API calls (Midnight, Oracle)
 requests>=2.31.0
+
+# Masumi Cardano Agent (Cardano blockchain integration)
+# Note: Masumi is installed as a local package, dependencies included below
+crewai[tools]>=0.108.0
+langtrace-python-sdk==3.8.9
