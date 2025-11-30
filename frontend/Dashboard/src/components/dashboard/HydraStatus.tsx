@@ -132,7 +132,7 @@ export function HydraStatus({ mode, connected, headState, activeNegotiations, cu
       </div>
 
       {/* Head Information */}
-      {(activeNegotiations && activeNegotiations > 0) || currentHeadId ? (
+      {((activeNegotiations && activeNegotiations > 0) || currentHeadId) && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}

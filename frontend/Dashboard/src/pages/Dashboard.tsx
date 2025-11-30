@@ -34,8 +34,7 @@ export default function Dashboard() {
         agentStatus,
         currentConversation,
         hydraStatus,
-        workflowSteps,
-        stats
+        workflowSteps
     } = useWebSocket();
 
     // Mock data for charts (could be replaced with real data from WebSocket)
@@ -232,9 +231,9 @@ export default function Dashboard() {
                                 <HydraStatus
                                     mode={hydraStatus.mode}
                                     connected={hydraStatus.connected}
-                                    headState={hydraStatus.headState}
-                                    activeNegotiations={hydraStatus.activeNegotiations}
-                                    currentHeadId={hydraStatus.currentHeadId}
+                                    headState={hydraStatus.head_state}
+                                    activeNegotiations={hydraStatus.active_negotiations}
+                                    currentHeadId={hydraStatus.current_head_id}
                                 />
 
                                 {/* Workflow Steps if active */}
@@ -242,7 +241,7 @@ export default function Dashboard() {
                                     <Card className="glass-panel p-6">
                                         <h3 className="text-lg font-semibold mb-4">Active Workflow</h3>
                                         <div className="space-y-3">
-                                            {workflowSteps.map((step, index) => (
+                                            {workflowSteps.map((step, _index) => (
                                                 <div key={step.step} className="flex items-center gap-4 p-3 rounded-lg bg-white/5">
                                                     <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold">
                                                         {step.step}

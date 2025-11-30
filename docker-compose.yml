@@ -15,6 +15,7 @@ services:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
       - HYDRA_NODE_URL=${HYDRA_NODE_URL:-ws://127.0.0.1:4001}
       - HYDRA_MODE=${HYDRA_MODE:-auto}
+      - KUPO_BASE_URL=${KUPO_BASE_URL:-https://kupo-preprod.kupo.network}
       - MIDNIGHT_API_URL=${MIDNIGHT_API_URL:-}
       - MIDNIGHT_API_KEY=${MIDNIGHT_API_KEY:-}
       - BLOCKFROST_PROJECT_ID=${BLOCKFROST_PROJECT_ID:-}
