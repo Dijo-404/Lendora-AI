@@ -1,10 +1,10 @@
 # Lendora AI
 
-Privacy-First DeFi Lending on Cardano
+**Privacy-First DeFi Lending on Cardano**
 
 Lendora is a decentralized lending protocol that uses AI agents to negotiate loans in private Hydra Heads with zero gas fees, employing Midnight zero-knowledge proofs for credit scoring, and featuring an immersive dashboard interface.
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Docker Deployment (Recommended)
 
@@ -44,7 +44,7 @@ npm run dev
 
 **Note:** The system automatically falls back to mock Hydra mode when no Hydra node is available. All functionality works identically in mock mode.
 
-## Architecture
+## 🏗️ Architecture
 
 ```mermaid
 sequenceDiagram
@@ -72,18 +72,18 @@ sequenceDiagram
     Note over B,A: Saved 1.5% through AI negotiation!
 ```
 
-### Workflow Components
+### Core Components
 
-- **Midnight Network**: Zero-knowledge credit verification
-- **Hydra Heads**: Layer 2 scaling for off-chain negotiations
-- **AI Agents**: Automated loan analysis and negotiation
+- **Midnight Network**: Zero-knowledge credit verification ([docs/midnight.md](docs/midnight.md))
+- **Hydra Heads**: Layer 2 scaling for off-chain negotiations ([docs/hydra.md](docs/hydra.md))
+- **AI Agents**: Automated loan analysis and negotiation ([docs/masumi.md](docs/masumi.md))
 - **Aiken Validators**: On-chain settlement verification
 
 ### Data Flow
 
 Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negotiation → Aiken Settlement
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 ### Backend Components
 
@@ -99,7 +99,6 @@ Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negoti
 
 | Component | Technology | Description |
 |-----------|------------|-------------|
-| 3D Interface | React Three Fiber | Immersive data visualization |
 | UI Framework | React + TypeScript | Type-safe user interface |
 | Build System | Vite | Fast development and bundling |
 | Styling | Tailwind CSS | Utility-first CSS framework |
@@ -109,31 +108,27 @@ Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negoti
 
 ### Complete Lending Workflow
 
-1. **Privacy-Preserving Credit Checks** - Zero-knowledge proofs via Midnight Network
-2. **AI-Powered Analysis** - Local Llama 3 model analyzes loan terms
-3. **Layer 2 Negotiation** - Zero-gas Hydra Head protocol for off-chain negotiation
-4. **Automated Settlement** - Smart contract verification with dual signatures
-5. **Real-time Monitoring** - WebSocket-based live updates
+1. Privacy-Preserving Credit Checks - Zero-knowledge proofs via Midnight Network
+2. AI-Powered Analysis - Local Llama 3 model analyzes loan terms
+3. Layer 2 Negotiation - Zero-gas Hydra Head protocol for off-chain negotiation
+4. Automated Settlement - Smart contract verification with dual signatures
+5. Real-time Monitoring - WebSocket-based live updates
 
 ### AI Agent System
 
-- **Borrower Agent (Lenny)** - Optimizes loan terms through negotiation
-- **Lender Agent (Luna)** - Risk assessment and counter-offer evaluation
-- **Explainable AI** - Decision logging with reasoning and confidence scores & confidence
+- Borrower Agent (Lenny) - Optimizes loan terms through negotiation
+- Lender Agent (Luna) - Risk assessment and counter-offer evaluation
+- Explainable AI - Decision logging with reasoning and confidence scores
 
 ### Frontend Dashboard
 
-- **3D Login Portal** - Holographic cube with particle field
-- **Wallet Connection** - Eternl, Nami, and other CIP-30 wallets
-- **Role Selection** - Choose to be Borrower or Lender
-- **Stablecoin Selection** - USDT, USDC, DAI with liquidity suggestions
-- **Auto-Confirm Toggle** - Let AI auto-accept good deals
-- **Agent Conversations** - Real-time negotiation chat between agents
-- **AI Thoughts** - View Masumi's reasoning and confidence scores
-- **Agent Status Orb** - Real-time 3D sphere (green=profiting, blue=negotiating)
-- **Workflow Visualizer** - Live step-by-step progress
-- **Trade History** - Completed loans with savings shown
-- **Dual Themes** - Cyber-Noir (dark) / Foggy Future (light)
+- Wallet Connection - Eternl, Nami, and other CIP-30 wallets
+- Role Selection - Choose to be Borrower or Lender
+- Stablecoin Selection - USDT, USDC, DAI with liquidity suggestions
+- Auto-Confirm Toggle - Let AI auto-accept good deals
+- Agent Conversations - Real-time negotiation chat between agents
+- Workflow Visualizer - Live step-by-step progress
+- Trade History - Completed loans with savings shown
 
 ## Installation
 
@@ -150,11 +145,10 @@ Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negoti
 git clone <repository-url>
 cd Lendora-AI
 
-# Install backend dependencies
+# Install dependencies
 pip install -r requirements.txt
 pip install -r backend/api/requirements.txt
 
-# Install frontend dependencies
 cd frontend/Dashboard
 npm install
 cd ../..
@@ -164,22 +158,18 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull llama3
 ```
 
-### Running the Application
+### Running
 
-**Terminal 1 - Backend:**
 ```bash
+# Terminal 1 - Backend
 cd backend/api
 uvicorn server:app --host 0.0.0.0 --port 8000
-```
 
-**Terminal 2 - Frontend:**
-```bash
+# Terminal 2 - Frontend
 cd frontend/Dashboard
 npm run dev
-```
 
-**Terminal 3 - Ollama:**
-```bash
+# Terminal 3 - Ollama
 ollama serve
 ```
 
@@ -190,15 +180,6 @@ ollama serve
 | Frontend | http://localhost:8080 |
 | Backend API | http://localhost:8000 |
 | API Documentation | http://localhost:8000/docs |
-| Ollama API | http://localhost:11434 |
-
-### First Use
-
-1. Install a Cardano wallet (Eternl recommended)
-2. Open http://localhost:8080
-3. Connect your wallet
-4. Select borrower or lender role
-5. Start a loan workflow
 
 ## API Reference
 
@@ -206,27 +187,11 @@ ollama serve
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/workflow/start` | POST | Initiate complete lending workflow |
+| `/api/workflow/start` | POST | Initiate lending workflow |
 | `/api/dashboard/stats` | GET | Get dashboard statistics |
 | `/api/trades/history` | GET | Retrieve trade history |
 | `/api/agent/status` | GET | Check AI agent status |
-| `/api/midnight/credit-check` | POST | Perform ZK credit verification |
 | `/ws` | WebSocket | Real-time updates |
-
-### Example API Call
-
-```bash
-curl -X POST http://localhost:8000/api/workflow/start \
-  -H "Content-Type: application/json" \
-  -d '{
-    "borrower_address": "addr1_borrower",
-    "lender_address": "addr1_lender",
-    "credit_score": 750,
-    "principal": 1000,
-    "interest_rate": 8.5,
-    "term_months": 12
-  }'
-```
 
 ## Project Structure
 
@@ -236,73 +201,23 @@ Lendora-AI/
 │   ├── borrower_agent.py       # Borrower negotiation agent
 │   ├── lender_agent.py         # Lender evaluation agent
 │   └── masumi/                 # Masumi Cardano analysis tools
-├── backend/
-│   ├── api/server.py           # FastAPI backend server
-│   └── cardano/                # Cardano transaction builders
+├── backend/                    # Backend services
+│   ├── api/server.py          # FastAPI backend server
+│   ├── cardano/               # Cardano transaction builders
+│   └── midnight/              # Midnight ZK client
 ├── contracts/                  # Aiken smart contracts
 ├── frontend/Dashboard/         # React frontend application
-├── hydra/                      # Hydra Head protocol client
-└── docs/                       # Documentation and guides
+├── hydra/                     # Hydra Head protocol client
+├── midnight/                  # Midnight compiled contracts
+└── docs/                      # Documentation and guides
+    ├── hydra.md               # Hydra Head protocol integration
+    ├── midnight.md            # Midnight ZK proofs
+    └── masumi.md              # Masumi AI agent system
 ```
 
-## Smart Contracts
+## Configuration
 
-### Aiken Settlement Validator
-
-Validates loan settlements with dual signature verification:
-
-```aiken
-validator {
-  fn settle(datum: LoanDatum, redeemer: SettleLoan, context: ScriptContext) -> Bool {
-    let interest_rate_valid = redeemer.final_interest_rate >= 0 &&
-                              redeemer.final_interest_rate <= 10000
-    let signed_by_borrower = list.has(transaction.extra_signatories, datum.borrower)
-    let signed_by_lender = list.has(transaction.extra_signatories, datum.lender)
-
-    interest_rate_valid && signed_by_borrower && signed_by_lender
-  }
-}
-```
-
-### Midnight ZK Circuit
-
-Zero-knowledge credit eligibility verification:
-
-```compact
-circuit check_eligibility(private credit_score: Uint) -> (public is_eligible: Boolean) {
-    const MIN_CREDIT_SCORE: Uint = 700;
-    is_eligible = credit_score > MIN_CREDIT_SCORE;
-    return (is_eligible);
-}
-```
-
-## Explainable AI
-
-All AI decisions are logged with reasoning and confidence scores for transparency and auditability.
-
-## Wallet Integration
-
-Lendora AI supports CIP-30 compatible Cardano wallets including Eternl, Nami, Yoroi, and Flint.
-
-### Connecting a Wallet
-
-1. Install a Cardano wallet extension (Eternl recommended)
-2. Create or import a wallet
-3. Ensure the wallet is unlocked
-4. Click "Connect Wallet" in the application
-5. Select your wallet and approve the connection
-
-### Supported Features
-
-- Real-time balance display
-- Network detection (Mainnet/Testnet)
-- Role selection (Borrower/Lender)
-- Transaction monitoring
-- Manual address entry option
-
-## Development
-
-### Environment Configuration
+### Environment Variables
 
 Optional environment variables can be set in a `.env` file:
 
@@ -318,13 +233,11 @@ VITE_API_URL=http://localhost:8000
 VITE_WS_URL=ws://localhost:8000/ws
 ```
 
+## Development
+
 ### Testing
 
 ```bash
-# Run contract tests
-cd contracts/contracts
-aiken check
-
 # Test Python syntax
 python -m py_compile agents/*.py backend/api/server.py
 
@@ -332,10 +245,6 @@ python -m py_compile agents/*.py backend/api/server.py
 cd frontend/Dashboard
 npm run build
 ```
-
-## Hydra Configuration
-
-The system automatically uses mock mode when no Hydra node is available. For production deployment with real Hydra nodes, see `docs/HYDRA_SETUP.md`.
 
 ## Resources
 
@@ -345,21 +254,12 @@ The system automatically uses mock mode when no Hydra node is available. For pro
 - [CrewAI Framework](https://docs.crewai.com/)
 - [Ollama](https://ollama.com/)
 
-## Deployment
+## Documentation
 
-### Docker
-
-```bash
-# Development
-./deploy.sh
-
-# Production
-./deploy.sh prod
-```
-
-### Manual Deployment
-
-See `docs/DEPLOYMENT.md` for detailed deployment instructions.
+- [Hydra Integration](docs/hydra.md)
+- [Midnight ZK Proofs](docs/midnight.md)
+- [Masumi AI Agent](docs/masumi.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
 
 ## License
 
