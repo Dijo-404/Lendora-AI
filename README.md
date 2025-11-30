@@ -29,6 +29,12 @@ vercel --prod
 vercel --prod --local-config vercel-backend.json
 ```
 
+**Vercel Dashboard Setup:**
+1. Go to your project settings
+2. Add these environment variables:
+   - `VITE_API_URL` = `https://your-backend-url.vercel.app`
+   - `VITE_WS_URL` = `wss://your-backend-url.vercel.app`
+
 **Vercel Access Points:**
 - Frontend: https://your-project.vercel.app
 - Backend API: https://your-backend.vercel.app
