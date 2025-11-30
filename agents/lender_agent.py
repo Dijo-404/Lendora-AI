@@ -262,20 +262,37 @@ class XAITool(BaseTool):
 
 def create_lender_agent() -> Agent:
     """Create the Luna lender agent."""
-    return Agent(
-        role="DeFi Lender",
-        goal="Evaluate loan requests and maximize returns while managing risk",
-        backstory=(
-            "You are Luna, a prudent DeFi lender. "
-            "You carefully assess risk, evaluate offers, "
-            "and make fair lending decisions with clear reasoning."
-        ),
-        verbose=True,
-        allow_delegation=False,
-        llm=get_llm(),
-        tools=[RiskAssessmentTool(), EvaluateOfferTool(), CreateOfferTool(), SignSettlementTool(), XAITool()],
-        max_iter=6
-    )
+    try:
+        llm = get_llm()
+        return Agent(
+            role="DeFi Lender",
+            goal="Evaluate loan requests and maximize returns while managing risk",
+            backstory=(
+                "You are Luna, a prudent DeFi lender. "
+                "You carefully assess risk, evaluate offers, "
+                "and make fair lending decisions with clear reasoning."
+            ),
+            verbose=True,
+            allow_delegation=False,
+            llm=llm,
+            tools=[RiskAssessmentTool(), EvaluateOfferTool(), CreateOfferTool(), SignSettlementTool(), XAITool()],
+            max_iter=6
+        )
+    except Exception as e:
+        print(f"[Luna] LLM not available ({e}), creating agent without LLM for mock operations")
+        return Agent(
+            role="DeFi Lender",
+            goal="Evaluate loan requests and maximize returns while managing risk",
+            backstory=(
+                "You are Luna, a prudent DeFi lender. "
+                "You carefully assess risk, evaluate offers, "
+                "and make fair lending decisions with clear reasoning."
+            ),
+            verbose=True,
+            allow_delegation=False,
+            tools=[RiskAssessmentTool(), EvaluateOfferTool(), CreateOfferTool(), SignSettlementTool(), XAITool()],
+            max_iter=6
+        )
 
 
 # ============================================================================

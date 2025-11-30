@@ -10,19 +10,35 @@ import { Button } from '@/components/ui/button';
 import { FluidBackground } from '@/components/ui/FluidBackground';
 import { InteractiveCharts } from '@/components/dashboard/InteractiveCharts';
 import { WalletConnection } from '@/components/dashboard/WalletConnection';
+import { AgentStatus } from '@/components/dashboard/AgentStatus';
+import { HydraStatus } from '@/components/dashboard/HydraStatus';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { Badge } from '@/components/ui/badge';
 import {
     LayoutDashboard,
     Settings,
     LogOut,
     Plus,
     Bell,
-    Search
+    Search,
+    Bot,
+    Network
 } from 'lucide-react';
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState('overview');
 
-    // Mock data for charts
+    // WebSocket connection for real-time updates
+    const {
+        isConnected,
+        agentStatus,
+        currentConversation,
+        hydraStatus,
+        workflowSteps,
+        stats
+    } = useWebSocket();
+
+    // Mock data for charts (could be replaced with real data from WebSocket)
     const mockTrades = [
         { timestamp: '2024-01-01', principal: 5000, interestRate: 8.5, profit: 120 },
         { timestamp: '2024-01-15', principal: 7500, interestRate: 8.2, profit: 180 },
@@ -56,6 +72,8 @@ export default function Dashboard() {
                     <nav className="space-y-2 flex-1">
                         {[
                             { id: 'overview', icon: LayoutDashboard, label: 'Overview' },
+                            { id: 'agents', icon: Bot, label: 'AI Agents' },
+                            { id: 'hydra', icon: Network, label: 'Hydra Network' },
                             { id: 'requests', icon: Plus, label: 'Loan Requests' },
                             { id: 'settings', icon: Settings, label: 'Settings' },
                         ].map((item) => (
@@ -116,43 +134,155 @@ export default function Dashboard() {
                         transition={{ delay: 0.2 }}
                         className="space-y-8"
                     >
-                        {/* Analytics Section */}
-                        <section>
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-semibold">Market Overview</h3>
-                                <div className="flex gap-2">
-                                    <Button size="sm" variant="outline" className="rounded-full">1W</Button>
-                                    <Button size="sm" variant="outline" className="rounded-full bg-primary text-primary-foreground border-none">1M</Button>
-                                    <Button size="sm" variant="outline" className="rounded-full">1Y</Button>
-                                </div>
-                            </div>
-
-                            <InteractiveCharts trades={mockTrades} />
-                        </section>
-
-                        {/* Recent Activity */}
-                        <section>
-                            <h3 className="text-xl font-semibold mb-6">Recent Activity</h3>
-                            <div className="grid gap-4">
-                                {[1, 2, 3].map((i) => (
-                                    <Card key={i} className="glass-panel p-4 flex items-center justify-between hover-lift">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                                                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                            </div>
+                        {/* Overview Tab */}
+                        {activeTab === 'overview' && (
+                            <>
+                                {/* Connection Status */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <Card className="glass-panel p-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
                                             <div>
-                                                <h4 className="font-medium">Loan Request #{1000 + i}</h4>
-                                                <p className="text-sm text-muted-foreground">Negotiating via Hydra Head</p>
+                                                <p className="text-sm font-medium">Backend</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    {isConnected ? 'Connected' : 'Disconnected'}
+                                                </p>
                                             </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="font-bold">5,000 ADA</p>
-                                            <p className="text-sm text-green-500">8.5% APR</p>
                                         </div>
                                     </Card>
-                                ))}
+
+                                    <Card className="glass-panel p-4">
+                                        <div className="flex items-center gap-3">
+                                            <Bot className={`w-5 h-5 ${agentStatus.status === 'idle' ? 'text-green-500' : 'text-blue-500'}`} />
+                                            <div>
+                                                <p className="text-sm font-medium">AI Agent</p>
+                                                <p className="text-xs text-muted-foreground capitalize">
+                                                    {agentStatus.status}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </Card>
+
+                                    <Card className="glass-panel p-4">
+                                        <div className="flex items-center gap-3">
+                                            <Network className={`w-5 h-5 ${hydraStatus.mode === 'real' ? 'text-green-500' : hydraStatus.mode === 'mock' ? 'text-blue-500' : 'text-red-500'}`} />
+                                            <div>
+                                                <p className="text-sm font-medium">Hydra Network</p>
+                                                <p className="text-xs text-muted-foreground capitalize">
+                                                    {hydraStatus.mode}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                </div>
+
+                                {/* Analytics Section */}
+                                <section>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h3 className="text-xl font-semibold">Market Overview</h3>
+                                        <div className="flex gap-2">
+                                            <Button size="sm" variant="outline" className="rounded-full">1W</Button>
+                                            <Button size="sm" variant="outline" className="rounded-full bg-primary text-primary-foreground border-none">1M</Button>
+                                            <Button size="sm" variant="outline" className="rounded-full">1Y</Button>
+                                        </div>
+                                    </div>
+
+                                    <InteractiveCharts trades={mockTrades} />
+                                </section>
+
+                                {/* Recent Activity */}
+                                <section>
+                                    <h3 className="text-xl font-semibold mb-6">Recent Activity</h3>
+                                    <div className="grid gap-4">
+                                        {[1, 2, 3].map((i) => (
+                                            <Card key={i} className="glass-panel p-4 flex items-center justify-between hover-lift">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="font-medium">Loan Request #{1000 + i}</h4>
+                                                        <p className="text-sm text-muted-foreground">Negotiating via Hydra Head</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold">5,000 ADA</p>
+                                                    <p className="text-sm text-green-500">8.5% APR</p>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </section>
+                            </>
+                        )}
+
+                        {/* AI Agents Tab */}
+                        {activeTab === 'agents' && (
+                            <AgentStatus
+                                status={agentStatus.status}
+                                task={agentStatus.task}
+                                conversation={currentConversation}
+                                workflowSteps={workflowSteps}
+                            />
+                        )}
+
+                        {/* Hydra Network Tab */}
+                        {activeTab === 'hydra' && (
+                            <div className="space-y-6">
+                                <HydraStatus
+                                    mode={hydraStatus.mode}
+                                    connected={hydraStatus.connected}
+                                    headState={hydraStatus.headState}
+                                    activeNegotiations={hydraStatus.activeNegotiations}
+                                    currentHeadId={hydraStatus.currentHeadId}
+                                />
+
+                                {/* Workflow Steps if active */}
+                                {workflowSteps.length > 0 && (
+                                    <Card className="glass-panel p-6">
+                                        <h3 className="text-lg font-semibold mb-4">Active Workflow</h3>
+                                        <div className="space-y-3">
+                                            {workflowSteps.map((step, index) => (
+                                                <div key={step.step} className="flex items-center gap-4 p-3 rounded-lg bg-white/5">
+                                                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold">
+                                                        {step.step}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <p className="font-medium">{step.name}</p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            {step.details?.message || JSON.stringify(step.details)}
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant="outline" className="capitalize">
+                                                        {step.status}
+                                                    </Badge>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Card>
+                                )}
                             </div>
-                        </section>
+                        )}
+
+                        {/* Loan Requests Tab */}
+                        {activeTab === 'requests' && (
+                            <section>
+                                <h3 className="text-xl font-semibold mb-6">Loan Requests</h3>
+                                <Card className="glass-panel p-6">
+                                    <p className="text-muted-foreground">Loan request functionality coming soon...</p>
+                                </Card>
+                            </section>
+                        )}
+
+                        {/* Settings Tab */}
+                        {activeTab === 'settings' && (
+                            <section>
+                                <h3 className="text-xl font-semibold mb-6">Settings</h3>
+                                <Card className="glass-panel p-6">
+                                    <p className="text-muted-foreground">Settings panel coming soon...</p>
+                                </Card>
+                            </section>
+                        )}
                     </motion.div>
                 </main>
             </div>
