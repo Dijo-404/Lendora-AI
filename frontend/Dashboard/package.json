@@ -10,9 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@cardano-foundation/cardano-connect-with-wallet": "^0.2.15",
+    "@hydra-sdk/bridge": "^1.1.5",
     "@hydra-sdk/core": "^1.1.5",
     "@hydra-sdk/transaction": "^1.1.5",
-    "@hydra-sdk/bridge": "^1.1.5",
     "@radix-ui/react-slot": "^1.2.4",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",

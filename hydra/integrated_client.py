@@ -21,9 +21,9 @@ from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 
 from .head_manager import HydraClient, HydraNegotiationManager, NegotiationState, Settlement
-from ..agents.masumi.crew import DegenCrew
-from ..agents.masumi.tools.kupo_tool import KupoTool
-from ..agents.masumi.tools.token_registry_tool import TokenRegistryTool
+from agents.masumi.crew import DegenCrew
+from agents.masumi.tools.kupo_tool import KupoTool
+from agents.masumi.tools.token_registry_tool import TokenRegistryTool
 
 
 @dataclass
@@ -61,8 +61,15 @@ class IntegratedHydraMasumiClient:
         self.kupo_tool = KupoTool(base_url=kupo_base_url) if kupo_base_url else None
         self.token_registry_tool = TokenRegistryTool(base_url=token_registry_url)
 
-        # Masumi Crew for AI analysis
-        self.masumi_crew = DegenCrew()
+        # Masumi Crew for AI analysis (with error handling)
+        try:
+            self.masumi_crew = DegenCrew()
+            self.masumi_available = True
+            print("[Integrated] Masumi AI analysis enabled")
+        except Exception as e:
+            print(f"[Integrated] Masumi AI analysis disabled: {e}")
+            self.masumi_crew = None
+            self.masumi_available = False
 
         print("[Integrated] Initialized Hydra + Masumi client")
         if self.kupo_tool:
@@ -117,29 +124,29 @@ class IntegratedHydraMasumiClient:
             except Exception as e:
                 print(f"[Integrated] Token registry lookup failed: {e}")
 
-        # Use Masumi crew for comprehensive analysis
-        analysis_inputs = {
-            'addresses': [borrower_address]
+        # Use Masumi crew for comprehensive analysis (if available)
+        masumi_analysis = {}
+        if self.masumi_available and self.masumi_crew:
+            analysis_inputs = {
+                'addresses': [borrower_address]
+            }
+
+            try:
+                masumi_result = self.masumi_crew.crew().kickoff(inputs=analysis_inputs)
+                print("[Integrated] Masumi AI analysis completed")
+                masumi_analysis = str(masumi_result)
+            except Exception as e:
+                print(f"[Integrated] Masumi analysis failed: {e}")
+                masumi_analysis = {"error": str(e)}
+        else:
+            masumi_analysis = {"status": "unavailable", "reason": "LLM not configured"}
+
+        return {
+            "borrower_address": borrower_address,
+            "blockchain_data": blockchain_data,
+            "masumi_analysis": masumi_analysis,
+            "timestamp": time.time()
         }
-
-        try:
-            masumi_result = self.masumi_crew.crew().kickoff(inputs=analysis_inputs)
-            print("[Integrated] Masumi AI analysis completed")
-
-            return {
-                "borrower_address": borrower_address,
-                "blockchain_data": blockchain_data,
-                "masumi_analysis": str(masumi_result),
-                "timestamp": time.time()
-            }
-        except Exception as e:
-            print(f"[Integrated] Masumi analysis failed: {e}")
-            return {
-                "borrower_address": borrower_address,
-                "blockchain_data": blockchain_data,
-                "masumi_analysis": {"error": str(e)},
-                "timestamp": time.time()
-            }
 
     async def negotiate_with_ai_analysis(
         self,
