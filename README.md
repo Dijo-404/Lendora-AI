@@ -19,7 +19,22 @@ docker-compose up -d
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-**Access Points:**
+### Vercel Deployment (Cloud)
+
+```bash
+# Deploy frontend only
+vercel --prod
+
+# Deploy backend only (from project root)
+vercel --prod --local-config vercel-backend.json
+```
+
+**Vercel Access Points:**
+- Frontend: https://your-project.vercel.app
+- Backend API: https://your-backend.vercel.app
+- API Documentation: https://your-backend.vercel.app/docs
+
+**Docker Access Points:**
 - Frontend: http://localhost:80
 - Backend API: http://localhost:8000
 - API Documentation: http://localhost:8000/docs
@@ -245,6 +260,23 @@ python -m py_compile agents/*.py backend/api/server.py
 cd frontend/Dashboard
 npm run build
 ```
+
+### Vercel Deployment Notes
+
+**Important:** Vercel has limitations for AI/ML workloads:
+
+1. **Ollama not available** - Use external Ollama instance or cloud AI service
+2. **Function timeout** - Long-running negotiations may timeout (10s limit)
+3. **Storage limits** - No persistent storage for logs/models
+
+**Recommended Setup:**
+- Deploy frontend to Vercel
+- Deploy backend to Railway/Heroku/Render (supports longer timeouts)
+- Use external Ollama service (e.g., RunPod, Together AI, or self-hosted)
+
+**For Local Development:**
+- Use Docker deployment (`./deploy.sh`)
+- Ollama runs locally with full AI capabilities
 
 ## Resources
 

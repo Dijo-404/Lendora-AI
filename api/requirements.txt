@@ -1,0 +1,21 @@
+# Vercel-specific requirements for backend deployment
+# Core dependencies (minimal for serverless functions)
+
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+pydantic>=2.5.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# AI/ML dependencies (for Vercel deployment)
+crewai[tools]>=0.108.0
+langchain>=0.1.0
+langchain-openai>=0.0.5
+litellm>=1.0.0
+
+# Cardano utilities
+pydantic>=2.5.0
+
+# Note: Some dependencies like pycardano, torch, etc. may need to be installed
+# separately or conditionally based on Vercel limits

@@ -21,11 +21,6 @@
       "destination": "/index.html"
     }
   ],
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python3.12"
-    }
-  },
   "env": {
     "VITE_API_URL": "@vite_api_url",
     "VITE_WS_URL": "@vite_ws_url"
