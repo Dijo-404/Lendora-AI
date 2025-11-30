@@ -1,11 +1,15 @@
 # Vercel-specific requirements for backend deployment
 # MINIMAL dependencies only - heavy AI/ML packages excluded due to size limits
+# Pinned versions to minimize size and avoid pulling in unnecessary dependencies
 
-# Core API dependencies
-fastapi>=0.109.0
-pydantic>=2.5.0
-python-dotenv>=1.0.0
-requests>=2.31.0
+# Core API dependencies (minimal set)
+fastapi==0.109.0
+pydantic==2.5.0
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Note: uvicorn is included by FastAPI but Vercel uses its own server
+# No need to explicitly include it
 
 # NOTE: Full backend with AI features (CrewAI, LangChain, etc.) exceeds Vercel's
 # 250MB serverless function limit. For full functionality, deploy backend to:

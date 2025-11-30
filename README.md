@@ -286,16 +286,41 @@ npm run build
 
 ### Vercel Deployment Notes
 
-**Important:** Vercel has limitations for AI/ML workloads:
+**CRITICAL:** Vercel has a **250MB unzipped size limit** for serverless functions. The full backend with AI dependencies exceeds this limit.
 
-1. **Ollama not available** - Use external Ollama instance or cloud AI service
-2. **Function timeout** - Long-running negotiations may timeout (10s limit)
-3. **Storage limits** - No persistent storage for logs/models
+**Solution - Split Deployment (Recommended):**
 
-**Recommended Setup:**
-- Deploy frontend to Vercel
-- Deploy backend to Railway/Heroku/Render (supports longer timeouts)
-- Use external Ollama service (e.g., RunPod, Together AI, or self-hosted)
+1. **Frontend on Vercel** (works perfectly):
+   ```bash
+   vercel --prod
+   ```
+   - No size issues
+   - Fast, reliable hosting
+   - Perfect for React apps
+
+2. **Backend on Railway/Render** (for full AI features):
+   ```bash
+   # Railway (recommended)
+   railway login
+   railway init
+   railway up
+   ```
+   - Supports full AI dependencies
+   - No size limits
+   - Better for long-running processes
+
+3. **Minimal Backend on Vercel** (basic API only):
+   ```bash
+   vercel --prod --local-config vercel-backend.json
+   ```
+   - Only basic endpoints (no AI features)
+   - Uses minimal dependencies (~50MB)
+   - Good for simple API needs
+
+**Other Vercel Limitations:**
+- Ollama not available - Use external Ollama instance
+- Function timeout - 10s limit (too short for AI negotiations)
+- Storage limits - No persistent storage
 
 **For Local Development:**
 - Use Docker deployment (`./deploy.sh`)

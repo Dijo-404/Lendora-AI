@@ -1,4 +1,11 @@
 # Vercel ignore file - exclude large dependencies and unnecessary files
+# This prevents Vercel from packaging large files in serverless functions
+
+# Exclude entire backend directory (too large with AI dependencies)
+backend/
+agents/
+hydra/
+midnight/
 
 # Large AI/ML dependencies (too large for serverless functions)
 venv/
@@ -7,6 +14,8 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+*.py[cod]
+*$py.class
 
 # Node modules (for frontend, handled separately)
 node_modules/
@@ -24,6 +33,9 @@ frontend/
 models/
 checkpoints/
 weights/
+*.model
+*.pkl
+*.joblib
 
 # Build artifacts
 dist/
@@ -32,6 +44,7 @@ build/
 *.so
 *.dylib
 *.dll
+*.a
 
 # Logs and temporary files
 logs/
@@ -41,13 +54,15 @@ logs/
 .DS_Store
 .env
 .env.local
+.env.*.local
 
 # Git and version control
 .git/
 .gitignore
 .gitattributes
+.gitmodules
 
-# Documentation
+# Documentation (keep only essential)
 docs/
 *.md
 !README.md
@@ -56,6 +71,7 @@ docs/
 Dockerfile*
 docker-compose*.yml
 .dockerignore
+deploy.sh
 
 # IDE files
 .vscode/
@@ -63,28 +79,56 @@ docker-compose*.yml
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
 
 # Test files
 tests/
 test_*.py
 *_test.py
 __tests__/
+test/
+spec/
+*.test.py
 
 # Cardano node data (too large)
 cardano-node/
 node-data/
 node-ipc/
+*.db
+*.sqlite
+*.sqlite3
 
 # Midnight compiled contracts
-midnight/*.compact
+midnight/
+*.compact
 
 # Hydra keys and data
-hydra/keys/
+hydra/
 *.skey
 *.vkey
+*.addr
 
-# Large Python packages that should be excluded
-# (These will be installed via requirements.txt but shouldn't be in source)
+# Large Python packages
 *.whl
 *.tar.gz
+*.zip
+
+# Contracts and compiled code
+contracts/
+*.ak
+*.plutus
+
+# Large data files
+*.csv
+*.json
+*.jsonl
+!package.json
+!package-lock.json
+!tsconfig.json
+!vercel.json
+
+# Exclude everything except api/ directory for backend deployment
+# When deploying backend, only api/ should be included
 
