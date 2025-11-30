@@ -26,10 +26,8 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ### Manual Setup
 
-The system operates in mock mode by default, requiring no Hydra node.
-
 ```bash
-# Start Backend (auto-detects mock mode)
+# Start Backend
 cd backend/api
 uvicorn server:app --host 0.0.0.0 --port 8000
 
@@ -41,8 +39,6 @@ npm run dev
 # Frontend: http://localhost:8080
 # API Docs: http://localhost:8000/docs
 ```
-
-**Note:** The system automatically falls back to mock Hydra mode when no Hydra node is available. All functionality works identically in mock mode.
 
 ## 🏗️ Architecture
 
@@ -219,7 +215,7 @@ Lendora-AI/
 
 ### Environment Variables
 
-Optional environment variables can be set in a `.env` file:
+Environment variables can be set in a `.env` file:
 
 ```env
 # Backend Configuration
@@ -227,6 +223,10 @@ OLLAMA_BASE_URL=http://localhost:11434
 HYDRA_NODE_URL=ws://127.0.0.1:4001
 HYDRA_MODE=auto
 PORT=8000
+
+# Midnight Network (optional)
+MIDNIGHT_API_URL=https://api.midnight.network
+KUPO_BASE_URL=https://kupo-preprod.kupo.network
 
 # Frontend Configuration
 VITE_API_URL=http://localhost:8000

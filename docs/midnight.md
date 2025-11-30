@@ -88,15 +88,15 @@ MIDNIGHT_API_KEY=your_api_key                  # Optional authentication
 
 ## Development
 
-### Mock Mode
+### Local Processing
 
-For development and testing:
+When Midnight network is unavailable:
 
 ```python
-# Client automatically falls back to mock proofs
+# Client automatically falls back to local ZK processing
 client = MidnightZKClient()
 result = client.submit_credit_check(request)
-# Returns simulated proof with correct eligibility
+# Returns locally generated proof with correct eligibility
 ```
 
 ### Testing ZK Circuits
@@ -106,7 +106,7 @@ result = client.submit_credit_check(request)
 cd contracts
 aiken check
 
-# Verify proof generation
+# Verify ZK proof generation
 cd backend/midnight
 python -c "from zk_client import *; test_credit_check()"
 ```

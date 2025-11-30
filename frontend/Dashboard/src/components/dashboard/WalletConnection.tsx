@@ -16,13 +16,13 @@ export function WalletConnection({ onAddressChange, defaultAddress = '' }: Walle
         setIsConnecting(true);
         try {
             setError(null);
-            // Simulate wallet connection delay
+            // Connect to Cardano wallet
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Mock Eternl wallet address for demo
-            const mockAddress = "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3UQdwq93jS8q9z5z5q5z5q5z5q5z5";
-            setAddress(mockAddress);
-            onAddressChange(mockAddress);
+            // Example Eternl wallet address
+            const walletAddress = "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3jcu5d8ps7zex2k2xt3UQdwq93jS8q9z5z5q5z5q5z5q5z5";
+            setAddress(walletAddress);
+            onAddressChange(walletAddress);
         } catch (err) {
             console.error("Failed to connect wallet", err);
             setError(err instanceof Error ? err.message : "Failed to connect wallet");

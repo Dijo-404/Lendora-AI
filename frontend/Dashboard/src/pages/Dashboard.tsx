@@ -169,7 +169,7 @@ export default function Dashboard() {
 
                                     <Card className="glass-panel p-4">
                                         <div className="flex items-center gap-3">
-                                            <Network className={`w-5 h-5 ${hydraStatus.mode === 'real' ? 'text-green-500' : hydraStatus.mode === 'mock' ? 'text-blue-500' : 'text-red-500'}`} />
+                                            <Network className={`w-5 h-5 ${hydraStatus.mode === 'hydra' ? 'text-green-500' : hydraStatus.mode === 'direct' ? 'text-blue-500' : 'text-red-500'}`} />
                                             <div>
                                                 <p className="text-sm font-medium">Hydra Network</p>
                                                 <p className="text-xs text-muted-foreground capitalize">

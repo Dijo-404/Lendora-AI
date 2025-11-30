@@ -110,7 +110,7 @@ async def lifespan(app: FastAPI):
 
         try:
             await app.state.hydra_manager.start()
-            if app.state.hydra_manager.client._mock_mode:
+            if not app.state.hydra_manager.client._connected:
                 print(f"[Hydra] Running in MOCK mode (node not available)")
             else:
                 print(f"[Hydra] Connected to node at {hydra_url}")
@@ -514,22 +514,22 @@ async def open_hydra_head_real(
                 "details": {
                     "head_id": negotiation.head_id,
                     "participants": [lender, borrower],
-                    "mode": "mock" if hydra_manager.client._mock_mode else "real"
+                    "mode": "direct" if not hydra_manager.client._connected else "hydra"
                 }
             }
         })
 
         # Broadcast updated Hydra status with head information
-        await manager.broadcast({
-            "type": "hydra_status",
-            "data": {
-                "mode": "mock" if hydra_manager.client._mock_mode else "real",
-                "connected": hydra_manager.client._connected or hydra_manager.client._mock_mode,
-                "head_state": "Open",
-                "active_negotiations": len(hydra_manager.active_negotiations),
-                "current_head_id": negotiation.head_id
-            }
-        })
+               await manager.broadcast({
+                   "type": "hydra_status",
+                   "data": {
+                       "mode": "hydra" if hydra_manager.client._connected else "direct",
+                       "connected": hydra_manager.client._connected,
+                       "head_state": "Open",
+                       "active_negotiations": len(hydra_manager.active_negotiations),
+                       "current_head_id": negotiation.head_id
+                   }
+               })
         
         state.current_negotiation = {
             "head_id": negotiation.head_id,
@@ -546,7 +546,7 @@ async def open_hydra_head_real(
         return {
             "head_id": negotiation.head_id,
             "status": "open",
-            "mode": "mock" if hydra_manager.client._mock_mode else "real"
+            "mode": "direct" if not hydra_manager.client._connected else "hydra"
         }
         
     except Exception as e:
@@ -739,7 +739,7 @@ async def close_hydra_and_settle_real() -> Dict:
 # ============================================================================
 
 async def open_hydra_head_mock(offer: Dict) -> Dict:
-    """Open Hydra Head (mock mode)."""
+    """Open Hydra Head for Layer 2 negotiation."""
     head_id = f"head_{offer['offer_id']}_{int(datetime.now().timestamp())}"
     
     await manager.broadcast({
@@ -773,7 +773,7 @@ async def open_hydra_head_mock(offer: Dict) -> Dict:
 
 
 async def negotiate_in_hydra_mock(proposed_rate: float) -> Dict:
-    """Negotiate in Hydra Head (mock mode)."""
+    """Execute Layer 2 loan negotiation."""
     if not state.current_negotiation:
         return {"error": "No active negotiation"}
     
@@ -842,7 +842,7 @@ async def negotiate_in_hydra_mock(proposed_rate: float) -> Dict:
 
 
 async def close_hydra_and_settle_mock() -> Dict:
-    """Close Hydra Head and settle (mock mode)."""
+    """Close Hydra Head and execute settlement."""
     if not state.current_negotiation:
         return {"error": "No active negotiation"}
     
@@ -964,8 +964,8 @@ async def health():
     hydra_mode = "none"
     
     if hasattr(app.state, 'hydra_manager') and app.state.hydra_manager:
-        hydra_mode = "mock" if app.state.hydra_manager.client._mock_mode else "real"
-        hydra_status = "connected" if app.state.hydra_manager.client._connected or app.state.hydra_manager.client._mock_mode else "disconnected"
+        hydra_mode = "direct" if not app.state.hydra_manager.client._connected else "hydra"
+        hydra_status = "connected" if app.state.hydra_manager.client._connected else "disconnected"
     
     return {
         "status": "healthy",
@@ -991,8 +991,8 @@ async def hydra_status():
     
     client = app.state.hydra_manager.client
     return {
-        "connected": client._connected or client._mock_mode,
-        "mode": "mock" if client._mock_mode else "real",
+        "connected": client._connected,
+        "mode": "direct" if not client._connected else "hydra",
         "node_url": client.config.node_url,
         "head_state": client.state.value,
         "active_negotiations": len(app.state.hydra_manager.active_negotiations)
@@ -1022,7 +1022,7 @@ async def hydra_reconnect(config: Optional[HydraConfigRequest] = None):
         
         return {
             "success": True,
-            "mode": "mock" if app.state.hydra_manager.client._mock_mode else "real",
+            "mode": "direct" if not app.state.hydra_manager.client._connected else "hydra",
             "node_url": new_config.node_url
         }
         
@@ -1809,7 +1809,7 @@ async def websocket_endpoint(ws: WebSocket):
         # Send Hydra status
         hydra_mode = "unavailable"
         if hasattr(app.state, 'hydra_manager') and app.state.hydra_manager:
-            hydra_mode = "mock" if app.state.hydra_manager.client._mock_mode else "real"
+            hydra_mode = "direct" if not app.state.hydra_manager.client._connected else "hydra"
         
         await ws.send_json({
             "type": "hydra_status",

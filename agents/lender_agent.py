@@ -279,7 +279,7 @@ def create_lender_agent() -> Agent:
             max_iter=6
         )
     except Exception as e:
-        print(f"[Luna] LLM not available ({e}), creating agent without LLM for mock operations")
+        print(f"[Luna] LLM not available ({e}), creating agent without LLM for basic operations")
         return Agent(
             role="DeFi Lender",
             goal="Evaluate loan requests and maximize returns while managing risk",

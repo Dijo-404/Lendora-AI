@@ -19,7 +19,7 @@ interface Conversation {
 }
 
 interface HydraStatus {
-  mode: 'real' | 'mock' | 'unavailable';
+  mode: 'hydra' | 'direct' | 'unavailable';
   connected?: boolean;
   head_state?: string;
   active_negotiations?: number;

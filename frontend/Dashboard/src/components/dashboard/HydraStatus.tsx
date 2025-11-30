@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Network, Zap, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 
 interface HydraStatusProps {
-  mode: 'real' | 'mock' | 'unavailable';
+  mode: 'hydra' | 'direct' | 'unavailable';
   connected?: boolean;
   headState?: string;
   activeNegotiations?: number;
@@ -14,9 +14,9 @@ interface HydraStatusProps {
 export function HydraStatus({ mode, connected, headState, activeNegotiations, currentHeadId }: HydraStatusProps) {
   const getModeColor = (mode: string) => {
     switch (mode) {
-      case 'real':
+      case 'hydra':
         return 'bg-green-500';
-      case 'mock':
+      case 'direct':
         return 'bg-blue-500';
       case 'unavailable':
         return 'bg-red-500';
@@ -27,9 +27,9 @@ export function HydraStatus({ mode, connected, headState, activeNegotiations, cu
 
   const getModeIcon = (mode: string) => {
     switch (mode) {
-      case 'real':
+      case 'hydra':
         return <CheckCircle2 className="w-4 h-4" />;
-      case 'mock':
+      case 'direct':
         return <Network className="w-4 h-4" />;
       case 'unavailable':
         return <XCircle className="w-4 h-4" />;
@@ -102,9 +102,9 @@ export function HydraStatus({ mode, connected, headState, activeNegotiations, cu
       {/* Mode Description */}
       <div className="mt-4 p-4 rounded-lg bg-secondary/30 border border-border">
         <div className="flex items-start gap-3">
-          {mode === 'real' ? (
+          {mode === 'hydra' ? (
             <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-          ) : mode === 'mock' ? (
+          ) : mode === 'direct' ? (
             <Network className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
           ) : (
             <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
@@ -112,19 +112,19 @@ export function HydraStatus({ mode, connected, headState, activeNegotiations, cu
 
           <div>
             <p className="text-sm font-semibold mb-1 text-foreground">
-              {mode === 'real'
-                ? 'Connected to Hydra Node'
-                : mode === 'mock'
-                ? 'Mock Mode Active'
-                : 'Hydra Unavailable'
+              {mode === 'hydra'
+                ? 'Hydra Layer 2 Active'
+                : mode === 'direct'
+                ? 'Direct Cardano Transactions'
+                : 'Layer 2 Unavailable'
               }
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              {mode === 'real'
-                ? 'Real-time Layer 2 negotiations with zero gas fees'
-                : mode === 'mock'
-                ? 'Simulated negotiations for development and testing'
-                : 'Connect to a Hydra node to enable Layer 2 features'
+              {mode === 'hydra'
+                ? 'Zero-fee negotiations on Cardano Layer 2'
+                : mode === 'direct'
+                ? 'Direct blockchain transactions with gas fees'
+                : 'Layer 2 connection required for optimal performance'
               }
             </p>
           </div>

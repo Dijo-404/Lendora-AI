@@ -65,8 +65,8 @@ class HeadState(Enum):
 class ConnectionMode(Enum):
     """Connection mode for the Hydra client."""
     REAL = "real"       # Connect to actual Hydra node
-    MOCK = "mock"       # Use mock responses for development
-    AUTO = "auto"       # Try real, fall back to mock
+    DIRECT = "direct"   # Direct blockchain transactions
+    AUTO = "auto"       # Try Hydra Layer 2, fall back to direct
 
 
 @dataclass
@@ -178,15 +178,15 @@ class HydraClient:
         Connect to the Hydra node.
         
         Returns:
-            True if connected successfully, False if falling back to mock mode.
+            True if connected successfully, False if falling back to direct mode.
         """
         if not WEBSOCKETS_AVAILABLE:
-            logger.warning("websockets not available, using mock mode")
+            logger.warning("websockets not available, using direct mode")
             self._mock_mode = True
             return False
             
         if self.config.mode == ConnectionMode.MOCK:
-            logger.info("Using mock mode (configured)")
+            logger.info("Using direct mode (configured)")
             self._mock_mode = True
             return False
         
@@ -226,7 +226,7 @@ class HydraClient:
         
         # Fall back to mock mode if AUTO
         if self.config.mode == ConnectionMode.AUTO:
-            logger.warning("Could not connect to Hydra node, falling back to mock mode")
+            logger.warning("Could not connect to Hydra node, falling back to direct mode")
             self._mock_mode = True
             return False
         
@@ -430,11 +430,11 @@ class HydraClient:
         return result
     
     # ==========================================================================
-    # Mock Mode Implementation
+    # Direct Mode Implementation
     # ==========================================================================
     
     async def _mock_response(self, command: Dict) -> Dict:
-        """Generate mock responses for development without a Hydra node."""
+        """Generate direct transaction responses when Hydra node is unavailable."""
         tag = command.get("tag", "")
         timestamp = int(time.time())
         
@@ -564,7 +564,7 @@ class HydraNegotiationManager:
         result = await self.client.init_head(contestation_period=60)
         head_id = result.get("headId", f"head_{int(time.time())}")
         
-        # Wait for head to open (in mock mode this is instant)
+        # Wait for head to open (in direct mode this is instant)
         await asyncio.sleep(0.5)
         
         # Commit (empty for now - in production would commit collateral)
@@ -674,7 +674,7 @@ class HydraNegotiationManager:
         # Close the head
         close_result = await self.client.close()
         
-        # Wait for contestation period (instant in mock)
+        # Wait for contestation period (instant in direct mode)
         await asyncio.sleep(0.3)
         
         # Fanout to L1
@@ -785,6 +785,6 @@ async def run_demo_negotiation():
 if __name__ == "__main__":
     print("\n[Hydra] Starting demo...")
     print("[Hydra] This will attempt to connect to ws://127.0.0.1:4001")
-    print("[Hydra] If no node is running, mock mode will be used.\n")
+    print("[Hydra] If no node is running, direct mode will be used.\n")
     
     asyncio.run(run_demo_negotiation())

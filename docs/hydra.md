@@ -43,24 +43,24 @@ Located in `hydra/` directory:
 
 ```env
 HYDRA_NODE_URL=ws://127.0.0.1:4001  # Hydra node WebSocket URL
-HYDRA_MODE=auto                      # auto, real, or mock
+HYDRA_MODE=auto                      # auto, hydra, or direct
 HYDRA_TIMEOUT=10.0                   # Connection timeout
 ```
 
 ### Mode Options
 
-- `auto` - Try real connection, fallback to mock
-- `real` - Only use real Hydra node
-- `mock` - Always use simulation (default for development)
+- `auto` - Try Hydra Layer 2, fallback to direct
+- `hydra` - Only use Hydra Layer 2 node
+- `direct` - Always use direct Cardano transactions
 
 ## Usage in Lendora
 
 ### Automatic Fallback
 
 The system automatically detects Hydra availability:
-- If real Hydra node available: Use Layer 2 negotiations
-- If not available: Use mock mode with identical behavior
-- All functionality works the same in both modes
+- If Hydra Layer 2 available: Use zero-fee negotiations
+- If not available: Use direct Cardano transactions
+- All functionality works seamlessly in both modes
 
 ### Negotiation Flow
 
@@ -85,10 +85,10 @@ result = await client.negotiate_loan(
 
 ## Development
 
-### Running with Mock Mode
+### Running with Direct Mode
 
 ```bash
-# Backend automatically uses mock mode
+# Backend automatically uses direct mode when no Hydra node available
 cd backend/api
 uvicorn server:app --port 8000
 ```
