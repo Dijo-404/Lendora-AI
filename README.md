@@ -46,18 +46,42 @@ npm run dev
 
 ## Architecture
 
-The system implements a complete DeFi lending workflow:
+```mermaid
+sequenceDiagram
+    participant B as Borrower
+    participant M as Midnight Network
+    participant L as Lender
+    participant AI as AI Agent (Lenny)
+    participant H as Hydra Head
+    participant A as Aiken Validator
 
-```
-Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negotiation → Aiken Settlement
+    B->>M: Submit Credit Score (private)
+    M->>L: is_eligible: true (ZK proof)
+    Note over M,L: Score remains HIDDEN!
+    L->>AI: Loan Offer (8.5%)
+    AI->>AI: Analyze with Llama 3
+    AI->>H: Open Hydra Head
+    loop Off-chain Negotiation
+        AI->>H: Counter-offer (zero gas)
+        H->>H: Real-time negotiation
+    end
+    AI->>H: Accept Final Terms (7.0%)
+    H->>A: Close Head + Settlement Tx
+    A->>A: Verify Dual Signatures
+    A->>B: Loan Disbursed!
+    Note over B,A: Saved 1.5% through AI negotiation!
 ```
 
-Key components:
+### Workflow Components
 
 - **Midnight Network**: Zero-knowledge credit verification
 - **Hydra Heads**: Layer 2 scaling for off-chain negotiations
 - **AI Agents**: Automated loan analysis and negotiation
 - **Aiken Validators**: On-chain settlement verification
+
+### Data Flow
+
+Borrower → Midnight ZK Check → Lender Offer → AI Analysis → Hydra Negotiation → Aiken Settlement
 
 ## Technology Stack
 
