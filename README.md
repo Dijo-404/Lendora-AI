@@ -1,6 +1,6 @@
 # Lendora AI
 
-**Privacy-First DeFi Lending on Cardano**
+**Privacy-First DeFi Lending**
 
 Lendora is a decentralized lending protocol that uses AI agents to negotiate loans in private Hydra Heads with zero gas fees, employing Midnight zero-knowledge proofs for credit scoring, and featuring an immersive dashboard interface.
 
